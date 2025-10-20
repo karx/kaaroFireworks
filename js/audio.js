@@ -368,15 +368,8 @@ function playLaunchSound(x, y) {
     const gainNode = audioContext.createGain();
     const panner = createPanner(x);
     
-    // Add subtle filter for tonal variation
-    const filter = audioContext.createBiquadFilter();
-    filter.type = 'highpass';
-    filter.frequency.value = 100 + Math.random() * 200; // 100-300 Hz
-    filter.Q.value = 0.5;
-    
-    // Audio routing with filter (no reverb for launch - keeps it crisp)
-    source.connect(filter);
-    filter.connect(gainNode);
+    // Simple routing (no filter, no reverb - keep launch sounds clear and audible)
+    source.connect(gainNode);
     gainNode.connect(panner);
     panner.connect(masterGain);
     
@@ -385,7 +378,8 @@ function playLaunchSound(x, y) {
     
     // Add random volume variation (±10%) for launch sounds
     const volumeVariation = 0.9 + Math.random() * 0.2; // 0.9 to 1.1
-    gainNode.gain.value = distanceVolume * preset.volumeMultiplier * 0.6 * volumeVariation;
+    // Increased volume significantly - launch sounds should be prominent
+    gainNode.gain.value = distanceVolume * preset.volumeMultiplier * 1.5 * volumeVariation;
     
     // Add slight random delay (0-20ms)
     const randomDelay = Math.random() * 0.02;
