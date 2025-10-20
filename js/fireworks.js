@@ -173,16 +173,12 @@ function createExplosion(x, y, style = null) {
         style = styles[Math.floor(Math.random() * styles.length)];
     }
     
-    // Debug logging
-    console.log('Creating explosion with style:', style);
-    
     // Get style configuration
     const styleConfig = window.fireworkStyles[style];
     if (!styleConfig) {
         console.error('Style not found:', style, 'Available styles:', Object.keys(window.fireworkStyles));
         return;
     }
-    console.log('Style config:', styleConfig);
     
     const shape = window.explosionShapes[styleConfig.shape];
     if (!shape) {
