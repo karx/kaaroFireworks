@@ -94,6 +94,25 @@
     
     <div id="panelBackdrop" class="panel-backdrop hidden"></div>
     
+    <div id="profiler" class="profiler hidden">
+        <div class="profiler-item">
+            <span class="profiler-label">FPS:</span>
+            <span class="profiler-value" id="fpsValue">60</span>
+        </div>
+        <div class="profiler-item">
+            <span class="profiler-label">Particles:</span>
+            <span class="profiler-value" id="particleCount">0</span>
+        </div>
+        <div class="profiler-item">
+            <span class="profiler-label">Pool:</span>
+            <span class="profiler-value" id="poolSize">0</span>
+        </div>
+        <div class="profiler-item">
+            <span class="profiler-label">Fireworks:</span>
+            <span class="profiler-value" id="fireworkCount">0</span>
+        </div>
+    </div>
+    
     <div class="controls">
         <button id="autoLaunch" class="btn-primary">Auto Launch</button>
         <button id="settingsToggle" class="btn-secondary">⚙️</button>
@@ -142,6 +161,28 @@
                 <option value="cartoonish">🎪 Cartoonish</option>
                 <option value="minimal">🔇 Minimal</option>
             </select>
+        </div>
+        
+        <div class="setting-group">
+            <label>Performance</label>
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="adaptiveQuality" checked>
+                    <span>Adaptive Quality</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="batterySaving">
+                    <span>Battery Saving</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="reducedMotion">
+                    <span>Reduced Motion</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showProfiler">
+                    <span>Show Profiler</span>
+                </label>
+            </div>
         </div>
         
         <div class="info">Tap anywhere to launch!</div>

@@ -328,6 +328,72 @@ const explosionTypes = {
 const fireworks = [];
 const particles = [];
 
+// Detect system preferences
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const prefersBatterySaving = window.matchMedia('(prefers-reduced-data: reduce)').matches;
+
+// Performance configuration
+const performanceConfig = {
+    targetFPS: 60,
+    currentFPS: 60,
+    frameCount: 0,
+    lastFrameTime: window.performance.now(),
+    fpsHistory: [],
+    adaptiveQuality: true,
+    batterySaving: prefersBatterySaving,
+    reducedMotion: prefersReducedMotion,
+    showProfiler: false
+};
+
+// Object pool for particles
+class ObjectPool {
+    constructor(createFn, resetFn, initialSize = 100) {
+        this.createFn = createFn;
+        this.resetFn = resetFn;
+        this.pool = [];
+        this.active = [];
+        
+        // Pre-allocate objects
+        for (let i = 0; i < initialSize; i++) {
+            this.pool.push(createFn());
+        }
+    }
+    
+    get() {
+        let obj;
+        if (this.pool.length > 0) {
+            obj = this.pool.pop();
+        } else {
+            obj = this.createFn();
+        }
+        this.active.push(obj);
+        return obj;
+    }
+    
+    release(obj) {
+        const index = this.active.indexOf(obj);
+        if (index > -1) {
+            this.active.splice(index, 1);
+            this.resetFn(obj);
+            this.pool.push(obj);
+        }
+    }
+    
+    releaseAll() {
+        while (this.active.length > 0) {
+            this.release(this.active[0]);
+        }
+    }
+    
+    getActiveCount() {
+        return this.active.length;
+    }
+    
+    getPoolSize() {
+        return this.pool.length;
+    }
+}
+
 // Background elements
 const stars = [];
 const cityBuildings = [];
@@ -621,6 +687,10 @@ class Firework {
 // Particle class - explosion particles
 class Particle {
     constructor(x, y, color, vx, vy, options = {}) {
+        this.init(x, y, color, vx, vy, options);
+    }
+    
+    init(x, y, color, vx, vy, options = {}) {
         this.x = x;
         this.y = y;
         this.color = color;
@@ -636,9 +706,9 @@ class Particle {
         // Enhanced features
         this.hasTrail = options.trail || false;
         this.trail = [];
-        this.trailLength = 8;
+        this.trailLength = performanceConfig.reducedMotion ? 3 : 8;
         this.customGravity = options.gravity || config.gravity;
-        this.twinkle = Math.random() > 0.7; // 30% chance to twinkle
+        this.twinkle = !performanceConfig.reducedMotion && Math.random() > 0.7;
         this.twinkleSpeed = Math.random() * 0.1 + 0.05;
         this.twinklePhase = Math.random() * Math.PI * 2;
         
@@ -752,6 +822,20 @@ class Particle {
     }
 }
 
+// Create particle pool (must be after Particle class definition)
+const particlePool = new ObjectPool(
+    () => new Particle(0, 0, '#ffffff', 0, 0),
+    (particle) => {
+        particle.x = 0;
+        particle.y = 0;
+        particle.vx = 0;
+        particle.vy = 0;
+        particle.alpha = 1;
+        particle.trail = [];
+    },
+    200
+);
+
 // Create explosion at position
 function createExplosion(x, y, type = null) {
     // Play explosion sound
@@ -765,7 +849,16 @@ function createExplosion(x, y, type = null) {
     
     const explosionConfig = explosionTypes[type];
     const shape = explosionShapes[explosionConfig.shape];
-    const velocities = shape(config.particleCount);
+    
+    // Adjust particle count based on performance
+    let particleCount = config.particleCount;
+    if (performanceConfig.batterySaving) {
+        particleCount = Math.floor(particleCount * 0.5);
+    } else if (performanceConfig.adaptiveQuality && performanceConfig.currentFPS < 30) {
+        particleCount = Math.floor(particleCount * 0.7);
+    }
+    
+    const velocities = shape(particleCount);
     
     // Get colors
     const colors = [];
@@ -773,17 +866,19 @@ function createExplosion(x, y, type = null) {
         colors.push(config.colors[Math.floor(Math.random() * config.colors.length)]);
     }
     
-    // Create particles with shape-based velocities
+    // Create particles with shape-based velocities using object pool
     for (let i = 0; i < velocities.length; i++) {
         const vel = velocities[i];
         const color = colors[i % colors.length];
         const options = {
-            trail: explosionConfig.trail,
+            trail: explosionConfig.trail && !performanceConfig.reducedMotion,
             gravity: explosionConfig.gravity,
             colorTransition: explosionConfig.colors > 1
         };
         
-        particles.push(new Particle(x, y, color, vel.vx, vel.vy, options));
+        const particle = particlePool.get();
+        particle.init(x, y, color, vel.vx, vel.vy, options);
+        particles.push(particle);
     }
 }
 
@@ -895,19 +990,58 @@ function launchFirework(targetX, targetY) {
     fireworks.push(new Firework(startX, startY, targetX, targetY));
 }
 
+// FPS monitoring
+function updateFPS() {
+    const now = window.performance.now();
+    const delta = now - performanceConfig.lastFrameTime;
+    performanceConfig.lastFrameTime = now;
+    
+    performanceConfig.frameCount++;
+    const fps = 1000 / delta;
+    performanceConfig.fpsHistory.push(fps);
+    
+    if (performanceConfig.fpsHistory.length > 60) {
+        performanceConfig.fpsHistory.shift();
+    }
+    
+    // Calculate average FPS
+    if (performanceConfig.frameCount % 10 === 0) {
+        const avgFPS = performanceConfig.fpsHistory.reduce((a, b) => a + b, 0) / performanceConfig.fpsHistory.length;
+        performanceConfig.currentFPS = Math.round(avgFPS);
+        
+        // Update profiler if visible
+        if (performanceConfig.showProfiler) {
+            updateProfiler();
+        }
+    }
+}
+
 // Animation loop
 function animate() {
     requestAnimationFrame(animate);
     
+    // Update FPS
+    updateFPS();
+    
+    // Skip frames in battery saving mode
+    if (performanceConfig.batterySaving && performanceConfig.frameCount % 2 === 0) {
+        return;
+    }
+    
     // Create trailing effect instead of clearing
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    const trailAlpha = performanceConfig.reducedMotion ? 0.2 : 0.1;
+    ctx.fillStyle = `rgba(0, 0, 0, ${trailAlpha})`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     // Draw background elements
-    drawBackground();
+    if (!performanceConfig.batterySaving) {
+        drawBackground();
+    }
     
     // Use additive blending for glow effect
-    ctx.globalCompositeOperation = 'lighter';
+    if (!performanceConfig.reducedMotion) {
+        ctx.globalCompositeOperation = 'lighter';
+    }
     
     // Update and draw fireworks
     for (let i = fireworks.length - 1; i >= 0; i--) {
@@ -927,7 +1061,8 @@ function animate() {
         particle.draw();
         
         if (particle.update()) {
-            // Particle faded out - remove it
+            // Particle faded out - return to pool
+            particlePool.release(particle);
             particles.splice(i, 1);
         }
     }
@@ -1072,6 +1207,45 @@ const audioPresetSelect = document.getElementById('audioPreset');
 audioPresetSelect.addEventListener('change', (e) => {
     audioConfig.preset = e.target.value;
 });
+
+// Performance controls
+const adaptiveQualityCheckbox = document.getElementById('adaptiveQuality');
+const batterySavingCheckbox = document.getElementById('batterySaving');
+const reducedMotionCheckbox = document.getElementById('reducedMotion');
+const showProfilerCheckbox = document.getElementById('showProfiler');
+const profilerElement = document.getElementById('profiler');
+
+adaptiveQualityCheckbox.addEventListener('change', (e) => {
+    performanceConfig.adaptiveQuality = e.target.checked;
+});
+
+batterySavingCheckbox.addEventListener('change', (e) => {
+    performanceConfig.batterySaving = e.target.checked;
+    if (e.target.checked) {
+        config.particleCount = config.isMobile ? 30 : 50;
+    } else {
+        config.particleCount = config.isMobile ? 60 : 100;
+    }
+});
+
+reducedMotionCheckbox.addEventListener('change', (e) => {
+    performanceConfig.reducedMotion = e.target.checked;
+});
+
+showProfilerCheckbox.addEventListener('change', (e) => {
+    performanceConfig.showProfiler = e.target.checked;
+    profilerElement.classList.toggle('hidden', !e.target.checked);
+});
+
+// Update profiler display
+function updateProfiler() {
+    if (!performanceConfig.showProfiler) return;
+    
+    document.getElementById('fpsValue').textContent = performanceConfig.currentFPS;
+    document.getElementById('particleCount').textContent = particles.length;
+    document.getElementById('poolSize').textContent = particlePool.getPoolSize();
+    document.getElementById('fireworkCount').textContent = fireworks.length;
+}
 
 // Update createExplosion calls to use selected type
 const originalCreateExplosion = createExplosion;
