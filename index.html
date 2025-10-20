@@ -263,7 +263,7 @@
         </div>
         
         <div id="qrCodeContainer" class="qr-code-container hidden">
-            <canvas id="qrCanvas" width="200" height="200"></canvas>
+            <div id="qrCanvas"></div>
             <div class="qr-label">Scan to share</div>
         </div>
         
@@ -449,6 +449,9 @@
             </div>
         </div>
     </div>
+    
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <!-- Firebase SDK (for multi-user sync) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>

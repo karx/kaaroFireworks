@@ -240,9 +240,24 @@ function initShareControls() {
         if (typeof QRCode !== 'undefined') {
             qrCodeContainer.classList.remove('hidden');
             const qrCanvas = document.getElementById('qrCanvas');
-            QRCode.toCanvas(qrCanvas, url, { width: 200 }, (error) => {
-                if (error) showShareMessage('QR code generation failed', false);
-            });
+            
+            // Clear previous QR code
+            qrCanvas.innerHTML = '';
+            
+            // Generate new QR code
+            try {
+                new QRCode(qrCanvas, {
+                    text: url,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (error) {
+                console.error('QR code error:', error);
+                showShareMessage('QR code generation failed', false);
+            }
         } else {
             showShareMessage('QR code library not loaded', false);
         }
