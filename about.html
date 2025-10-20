@@ -29,12 +29,13 @@
                 <h2>About the Project</h2>
                 <p>
                     Kaaro Fireworks is a lightweight, high-performance fireworks simulator built entirely with vanilla JavaScript 
-                    and the HTML5 Canvas API. Experience stunning visual effects, immersive audio, and interactive controls—all 
-                    running directly in your browser with zero dependencies.
+                    and the HTML5 Canvas API. Experience stunning visual effects, style-specific audio, and interactive controls—all 
+                    running directly in your browser with minimal dependencies.
                 </p>
                 <p>
-                    The project focuses on creating an engaging web experience through advanced rendering techniques, 
-                    realistic physics simulation, and synchronized audio-visual effects.
+                    The project features <strong>11 unique firework styles</strong> with individual audio characteristics, 
+                    a visual grid selector for easy style selection, layered sound effects, and real-time multi-user synchronization. 
+                    Built with advanced rendering techniques, realistic physics simulation, and synchronized audio-visual effects.
                 </p>
             </section>
 
@@ -45,11 +46,12 @@
                         <div class="feature-icon">🎨</div>
                         <h3>Visual Effects</h3>
                         <ul>
-                            <li>Custom explosion shapes (star, heart, ring)</li>
-                            <li>Multiple explosion types (willow, chrysanthemum, palm)</li>
-                            <li>Particle color transitions</li>
-                            <li>Sparkling & twinkling effects</li>
-                            <li>Bloom/glow enhancement</li>
+                            <li>11 unique firework styles with visual grid selector</li>
+                            <li>Custom shapes: Star, Heart, Ring, Spiral, Crossette, Peony, Double Ring</li>
+                            <li>Effect types: Willow, Chrysanthemum, Palm</li>
+                            <li>Particle color transitions & trails</li>
+                            <li>Additive blending for authentic glow</li>
+                            <li>Motion blur & bloom effects</li>
                         </ul>
                     </div>
 
@@ -57,38 +59,67 @@
                         <div class="feature-icon">🎵</div>
                         <h3>Audio System</h3>
                         <ul>
-                            <li>Web Audio API synthesis</li>
-                            <li>Stereo panning & reverb</li>
-                            <li>Distance-based volume</li>
-                            <li>Crackling particle sounds</li>
-                            <li>3 audio presets</li>
+                            <li>Style-specific audio (11 unique profiles)</li>
+                            <li>Layered sounds for complex effects</li>
+                            <li>Real OGG samples + Web Audio synthesis</li>
+                            <li>6 audio presets (Realistic, Epic, Minimal, etc.)</li>
+                            <li>Spatial audio: stereo panning, reverb, distance</li>
+                            <li>7 types of variation per sound</li>
+                            <li>Filter sweeps & special effects</li>
                         </ul>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-icon">📱</div>
-                        <h3>Mobile Optimized</h3>
+                        <h3>Performance & UX</h3>
                         <ul>
-                            <li>Touch-friendly controls</li>
-                            <li>Responsive design</li>
-                            <li>Adaptive performance</li>
+                            <li>Touch-friendly visual grid selector</li>
+                            <li>Responsive design (mobile-first)</li>
+                            <li>Adaptive quality & battery saving</li>
+                            <li>Particle pooling optimization</li>
                             <li>PWA support</li>
-                            <li>Gesture controls</li>
+                            <li>Privacy-friendly analytics (Plausible)</li>
+                            <li>Performance profiler</li>
                         </ul>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-icon">🚀</div>
-                        <h3>Sharing</h3>
+                        <h3>Sharing & Sync</h3>
                         <ul>
+                            <li>Multi-user real-time sync (Firebase)</li>
                             <li>URL-based config sharing</li>
-                            <li>Screenshot capture</li>
+                            <li>Screenshot capture & sharing</li>
                             <li>QR code generation</li>
                             <li>Save/load configurations</li>
                             <li>5 preset shows</li>
+                            <li>Text & image explosions</li>
                         </ul>
                     </div>
                 </div>
+            </section>
+
+            <section class="about-section">
+                <h2>Firework Styles</h2>
+                <p>Each of the 11 firework styles has unique visual and audio characteristics:</p>
+                <div class="styles-grid">
+                    <div class="style-item">💥 <strong>Sphere</strong> - Classic burst</div>
+                    <div class="style-item">⭐ <strong>Star</strong> - 5-pointed star</div>
+                    <div class="style-item">❤️ <strong>Heart</strong> - Romantic heart</div>
+                    <div class="style-item">⭕ <strong>Ring</strong> - Perfect circle</div>
+                    <div class="style-item">🌿 <strong>Willow</strong> - Drooping trails</div>
+                    <div class="style-item">🌸 <strong>Chrysanthemum</strong> - Multi-burst (3 layers)</div>
+                    <div class="style-item">🌴 <strong>Palm</strong> - Palm tree effect</div>
+                    <div class="style-item">🌀 <strong>Spiral</strong> - Rotating burst with filter sweep</div>
+                    <div class="style-item">✨ <strong>Crossette</strong> - Split bursts (2 layers)</div>
+                    <div class="style-item">🌺 <strong>Peony</strong> - Dense center</div>
+                    <div class="style-item">⭕⭕ <strong>Double Ring</strong> - Concentric circles (2 layers)</div>
+                </div>
+                <p style="margin-top: 16px; font-size: 14px; color: rgba(255,255,255,0.7);">
+                    <strong>Audio Characteristics:</strong> Each style has unique volume (0.85x-1.2x), brightness (9-15kHz), 
+                    decay (0.8x-1.5x), and reverb (0.8x-1.4x) settings. Three styles feature layered sounds for complex 
+                    multi-burst effects.
+                </p>
             </section>
 
             <section class="about-section">
@@ -108,6 +139,15 @@
                     </div>
                     <div class="tech-item">
                         <strong>Sharing:</strong> Web Share API, Clipboard API
+                    </div>
+                    <div class="tech-item">
+                        <strong>Real-time Sync:</strong> Firebase Realtime Database
+                    </div>
+                    <div class="tech-item">
+                        <strong>Analytics:</strong> Plausible Analytics (privacy-friendly)
+                    </div>
+                    <div class="tech-item">
+                        <strong>Audio Format:</strong> OGG Vorbis
                     </div>
                     <div class="tech-item">
                         <strong>Deployment:</strong> Netlify
@@ -192,6 +232,14 @@
             <section class="about-section">
                 <h2>Version History</h2>
                 <div class="version-history">
+                    <div class="version-item">
+                        <strong>v3.0</strong> - Style-Specific Audio & New Shapes (Current)
+                        <span>11 unique styles, layered sounds, visual grid selector, Crossette/Peony/Double Ring shapes</span>
+                    </div>
+                    <div class="version-item">
+                        <strong>v2.5</strong> - Multi-User Sync & Analytics
+                        <span>Real-time Firebase sync, Plausible analytics, text/image explosions</span>
+                    </div>
                     <div class="version-item">
                         <strong>v2.0</strong> - Shareability Features
                         <span>URL sharing, screenshots, preset shows, QR codes</span>
