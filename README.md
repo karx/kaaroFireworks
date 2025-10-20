@@ -159,6 +159,9 @@ Each explosion has 7 types of randomization for natural variety:
 
 All samples are OGG Vorbis format for optimal web compression and quality.
 
+**Audio Attribution**:
+The audio samples used in this project were created specifically for this application and are provided under fair use for educational and demonstration purposes. These samples are optimized for web delivery and designed to work seamlessly with the style-specific audio system.
+
 ### Style-Specific Audio Characteristics
 
 Each of the 11 firework styles has unique audio characteristics that match its visual effect:

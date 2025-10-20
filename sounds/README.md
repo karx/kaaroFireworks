@@ -70,14 +70,36 @@ If you have WAV/MP3 files, convert using:
 ffmpeg -i input.wav -c:a libvorbis -q:a 4 output.ogg
 ```
 
-## License
-All samples must be:
-- CC0 (Public Domain)
-- CC-BY (with attribution)
-- Or explicitly licensed for commercial use
+## License & Attribution
 
-## Attribution
-If using CC-BY samples, list attributions here:
+### Current Samples
+The audio samples included in this project were created specifically for the Kaaro Fireworks application.
 
-- `explosion_1.ogg` - [Author Name] - [License] - [Source URL]
-- `launch_1.ogg` - [Author Name] - [License] - [Source URL]
+**Usage Rights**:
+- Created for educational and demonstration purposes
+- Provided under fair use for non-commercial projects
+- Attribution appreciated but not required
+- Modifications allowed
+- No warranty provided
+
+**Fair Use Policy**:
+These samples are used under fair use principles for:
+- Educational purposes
+- Non-commercial demonstration
+- Technical illustration of Web Audio API capabilities
+- Open-source project development
+
+### Adding Your Own Samples
+If you add new samples to this project:
+- Ensure you have proper rights/licenses
+- Preferred licenses: CC0 (Public Domain), CC-BY, or commercial-use-allowed
+- Document attribution below if required
+
+### Sample Attribution
+Current samples:
+- `firework 1.ogg` - Created for Kaaro Fireworks - Fair Use
+- `firework 2.ogg` - Created for Kaaro Fireworks - Fair Use
+- `launch_1.ogg` - Created for Kaaro Fireworks - Fair Use
+
+If you replace these with other samples, list attributions here:
+- `[filename]` - [Author Name] - [License] - [Source URL]
