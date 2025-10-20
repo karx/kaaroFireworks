@@ -27,35 +27,35 @@ const audioPresets = {
         useSamples: true,
         volumeMultiplier: 1.0,
         reverbAmount: 0.4,
-        playbackRateVariation: 0.1,
+        playbackRateVariation: 0.2, // Increased from 0.1 for more variety
         distanceFalloff: 0.5
     },
     epic: {
         useSamples: true,
         volumeMultiplier: 1.2,
         reverbAmount: 0.7,
-        playbackRateVariation: 0.05,
+        playbackRateVariation: 0.15, // Increased from 0.05 for more variety
         distanceFalloff: 0.3
     },
     minimal: {
         useSamples: true,
         volumeMultiplier: 0.7,
         reverbAmount: 0.15,
-        playbackRateVariation: 0.05,
+        playbackRateVariation: 0.12, // Increased from 0.05 for more variety
         distanceFalloff: 0.7
     },
     cartoonish: {
         useSamples: true,
         volumeMultiplier: 1.0,
         reverbAmount: 0.2,
-        playbackRateVariation: 0.15,
+        playbackRateVariation: 0.25, // Increased from 0.15 for more variety
         distanceFalloff: 0.4
     },
     balanced: {
         useSamples: true,
         volumeMultiplier: 0.9,
         reverbAmount: 0.3,
-        playbackRateVariation: 0.08,
+        playbackRateVariation: 0.18, // Increased from 0.08 for more variety
         distanceFalloff: 0.45
     },
     synthesized: {
@@ -158,11 +158,16 @@ function createReverb() {
     return convolver;
 }
 
-// Create stereo panner based on position
+// Create stereo panner based on position with variation
 function createPanner(x) {
     const panner = audioContext.createStereoPanner();
     const normalizedX = (x / window.canvas.width) * 2 - 1; // -1 to 1
-    panner.pan.value = Math.max(-1, Math.min(1, normalizedX));
+    
+    // Add slight random pan variation (±0.1) for more spatial variety
+    const panVariation = (Math.random() - 0.5) * 0.2;
+    const finalPan = normalizedX + panVariation;
+    
+    panner.pan.value = Math.max(-1, Math.min(1, finalPan));
     return panner;
 }
 
@@ -197,7 +202,7 @@ function playExplosionSound(x, y) {
     const source = audioContext.createBufferSource();
     source.buffer = buffer;
     
-    // Playback rate variation (pitch)
+    // Playback rate variation (pitch) - increased for more variety
     const rateVariation = preset.playbackRateVariation;
     source.playbackRate.value = 1.0 + (Math.random() - 0.5) * rateVariation * 2;
     
@@ -208,25 +213,44 @@ function playExplosionSound(x, y) {
     const reverbGain = audioContext.createGain();
     const dryGain = audioContext.createGain();
     
-    // Audio routing
-    source.connect(dryGain);
+    // Add subtle filter for tonal variation
+    const filter = audioContext.createBiquadFilter();
+    filter.type = 'lowpass';
+    // Random filter frequency for tonal variety (8000-16000 Hz)
+    filter.frequency.value = 8000 + Math.random() * 8000;
+    filter.Q.value = 0.5 + Math.random() * 1.5; // Random resonance
+    
+    // Audio routing with filter
+    source.connect(filter);
+    filter.connect(dryGain);
     dryGain.connect(gainNode);
-    source.connect(reverb);
+    filter.connect(reverb);
     reverb.connect(reverbGain);
     reverbGain.connect(gainNode);
     gainNode.connect(panner);
     panner.connect(masterGain);
     
-    // Apply settings
+    // Apply settings with variations
     const distanceVolume = getDistanceVolume(x, y);
-    const reverbAmount = audioConfig.reverbAmount !== undefined ? audioConfig.reverbAmount : preset.reverbAmount;
     
-    gainNode.gain.value = distanceVolume * preset.volumeMultiplier;
+    // Add random volume variation (±15%) for more natural sound
+    const volumeVariation = 0.85 + Math.random() * 0.3; // 0.85 to 1.15
+    gainNode.gain.value = distanceVolume * preset.volumeMultiplier * volumeVariation;
+    
+    // Add random reverb variation (±20%) for spatial variety
+    const baseReverb = audioConfig.reverbAmount !== undefined ? audioConfig.reverbAmount : preset.reverbAmount;
+    const reverbVariation = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
+    const reverbAmount = Math.min(1.0, Math.max(0, baseReverb * reverbVariation));
+    
     dryGain.gain.value = 1 - reverbAmount;
     reverbGain.gain.value = reverbAmount;
     
+    // Add slight random delay (0-30ms) for more natural timing
+    const randomDelay = Math.random() * 0.03;
+    const startTime = audioContext.currentTime + randomDelay;
+    
     // Play
-    source.start(audioContext.currentTime);
+    source.start(startTime);
 }
 
 // Fallback: Synthesized explosion sound (simplified from original)
