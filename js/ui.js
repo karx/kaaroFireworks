@@ -134,7 +134,7 @@ function initSettingsControls() {
             const centerX = window.canvas.width / 2;
             const centerY = window.canvas.height * 0.3;
             
-            // Check if it's multiple words
+            // Launch locally
             if (text.includes(' ')) {
                 window.spellWordSequence(text, {
                     fontSize: fontSize,
@@ -144,6 +144,14 @@ function initSettingsControls() {
                 });
             } else {
                 window.launchTextFirework(text, centerX, centerY, {
+                    fontSize: fontSize
+                });
+            }
+            
+            // Broadcast to room if connected
+            if (window.syncState?.isConnected && window.broadcastFirework) {
+                window.broadcastFirework(centerX, centerY, 'text', {
+                    text: text,
                     fontSize: fontSize
                 });
             }

@@ -270,14 +270,21 @@ function handleRemoteEvent(event) {
             break;
             
         case 'text':
-            if (window.launchTextFirework) {
-                window.launchTextFirework(event.config.text, x, y, event.config);
+            if (window.launchTextFirework && event.config.text) {
+                // Launch text firework with config
+                window.launchTextFirework(event.config.text, x, y, {
+                    fontSize: event.config.fontSize || 100
+                });
             }
             break;
             
         case 'image':
-            // Image events would need special handling
-            console.log('Image event received (not yet implemented)');
+            // Image events cannot be synchronized (too large for Firebase)
+            // Show a placeholder firework instead
+            console.log('Image event received - showing placeholder');
+            if (window.launchFirework) {
+                window.launchFirework(x, y);
+            }
             break;
     }
 }
