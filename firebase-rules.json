@@ -1,0 +1,17 @@
+{
+  "rules": {
+    "rooms": {
+      "$roomId": {
+        ".read": true,
+        ".write": true,
+        ".indexOn": ["createdAt"],
+        "events": {
+          ".indexOn": ["timestamp"]
+        },
+        "participants": {
+          ".indexOn": ["joinedAt", "lastSeen"]
+        }
+      }
+    }
+  }
+}

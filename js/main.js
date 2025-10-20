@@ -84,6 +84,11 @@ function init() {
     window.initUserInteraction();
     window.loadURLConfig();
     
+    // Initialize sync controls
+    if (window.initSyncControls) {
+        window.initSyncControls();
+    }
+    
     // Initialize show editor
     if (window.initShowEditor) {
         window.initShowEditor();

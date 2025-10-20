@@ -393,6 +393,13 @@ function initUserInteraction() {
     window.canvas.addEventListener('click', (e) => {
         window.initAudio();
         window.launchFirework(e.clientX, e.clientY);
+        
+        // Broadcast to room if connected
+        if (window.syncState?.isConnected && window.broadcastFirework) {
+            window.broadcastFirework(e.clientX, e.clientY, 'firework', {
+                explosionType: window.selectedExplosionType || 'random'
+            });
+        }
     });
     
     window.canvas.addEventListener('touchstart', (e) => {
@@ -400,6 +407,13 @@ function initUserInteraction() {
         window.initAudio();
         const touch = e.touches[0];
         window.launchFirework(touch.clientX, touch.clientY);
+        
+        // Broadcast to room if connected
+        if (window.syncState?.isConnected && window.broadcastFirework) {
+            window.broadcastFirework(touch.clientX, touch.clientY, 'firework', {
+                explosionType: window.selectedExplosionType || 'random'
+            });
+        }
     });
 }
 
@@ -415,9 +429,123 @@ function loadURLConfig() {
     }
 }
 
+// Multi-user sync controls
+function initSyncControls() {
+    const createRoomBtn = document.getElementById('createRoomBtn');
+    const joinRoomBtn = document.getElementById('joinRoomBtn');
+    const leaveRoomBtn = document.getElementById('leaveRoomBtn');
+    const copyRoomLinkBtn = document.getElementById('copyRoomLinkBtn');
+    const userName = document.getElementById('userName');
+    const roomCodeInput = document.getElementById('roomCodeInput');
+    const syncConnected = document.getElementById('syncConnected');
+    const syncNotConnected = document.getElementById('syncNotConnected');
+    
+    // Initialize Firebase with project config
+    const firebaseConfig = {
+        apiKey: "AIzaSyAxxfI0aRS71NOE9VPMYsRKrm72ui4BREg",
+        authDomain: "ig-tool-rm.firebaseapp.com",
+        databaseURL: "https://ig-tool-rm.firebaseio.com",
+        projectId: "ig-tool-rm",
+        storageBucket: "ig-tool-rm.firebasestorage.app",
+        messagingSenderId: "492451868539",
+        appId: "1:492451868539:web:ac41abaa741b623b1e97de",
+        measurementId: "G-GLG0G677HG"
+    };
+    
+    // Initialize Firebase
+    if (typeof window.initFirebase === 'function') {
+        const initialized = window.initFirebase(firebaseConfig);
+        if (initialized) {
+            console.log('✅ Firebase initialized successfully');
+        } else {
+            console.error('❌ Firebase initialization failed');
+        }
+    }
+    
+    createRoomBtn?.addEventListener('click', async () => {
+        const name = userName?.value.trim() || 'Host';
+        const result = await window.createRoom(name);
+        
+        if (result) {
+            syncNotConnected?.classList.add('hidden');
+            syncConnected?.classList.remove('hidden');
+            
+            const roomCodeEl = document.getElementById('currentRoomCode');
+            if (roomCodeEl) roomCodeEl.textContent = result.roomId;
+            
+            showShareMessage(`Room created! Code: ${result.roomId}`, true);
+        } else {
+            showShareMessage('Failed to create room. Check Firebase setup.', false);
+        }
+    });
+    
+    joinRoomBtn?.addEventListener('click', async () => {
+        const roomCode = roomCodeInput?.value.trim().toUpperCase();
+        const name = userName?.value.trim() || 'Guest';
+        
+        if (!roomCode) {
+            showShareMessage('Please enter a room code', false);
+            return;
+        }
+        
+        const result = await window.joinRoom(roomCode, name);
+        
+        if (result) {
+            syncNotConnected?.classList.add('hidden');
+            syncConnected?.classList.remove('hidden');
+            
+            const roomCodeEl = document.getElementById('currentRoomCode');
+            if (roomCodeEl) roomCodeEl.textContent = result.roomId;
+            
+            showShareMessage(`Joined room: ${result.roomId}`, true);
+        } else {
+            showShareMessage('Failed to join room. Check room code.', false);
+        }
+    });
+    
+    leaveRoomBtn?.addEventListener('click', async () => {
+        await window.leaveRoom();
+        
+        syncConnected?.classList.add('hidden');
+        syncNotConnected?.classList.remove('hidden');
+        
+        if (roomCodeInput) roomCodeInput.value = '';
+        
+        showShareMessage('Left room', true);
+    });
+    
+    copyRoomLinkBtn?.addEventListener('click', async () => {
+        if (window.syncState?.roomId) {
+            const link = window.getRoomShareLink(window.syncState.roomId);
+            try {
+                await navigator.clipboard.writeText(link);
+                showShareMessage('Room link copied!', true);
+            } catch (e) {
+                showShareMessage('Failed to copy link', false);
+            }
+        }
+    });
+    
+    // Check URL for room code on load
+    if (typeof window.checkURLForRoom === 'function') {
+        window.checkURLForRoom();
+    }
+    
+    function showShareMessage(message, isSuccess = true) {
+        const shareMessage = document.getElementById('shareMessage');
+        if (shareMessage) {
+            shareMessage.textContent = message;
+            shareMessage.className = `share-message ${isSuccess ? 'success' : 'error'}`;
+            shareMessage.classList.remove('hidden');
+            setTimeout(() => shareMessage.classList.add('hidden'), 3000);
+        }
+    }
+}
+
 // Export for global access
 window.selectedExplosionType = selectedExplosionType;
 window.updateUIFromConfig = updateUIFromConfig;
 window.initUI = initUI;
 window.initUserInteraction = initUserInteraction;
 window.loadURLConfig = loadURLConfig;
+window.initSyncControls = initSyncControls;
