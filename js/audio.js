@@ -8,7 +8,8 @@ let masterGain;
 const audioConfig = {
     volume: 0.7,
     preset: 'realistic',
-    enableCrackling: true
+    enableCrackling: true,
+    reverbAmount: 0.4 // 0.0 to 1.0, overrides preset reverb
 };
 
 // Audio presets
@@ -140,9 +141,10 @@ function playExplosionSound(x, y) {
     gainNode.connect(panner);
     panner.connect(masterGain);
     
-    // Reverb mix
-    dryGain.gain.value = 1 - preset.reverbAmount;
-    reverbGain.gain.value = preset.reverbAmount;
+    // Reverb mix - use custom reverb amount if set, otherwise use preset
+    const reverbAmount = audioConfig.reverbAmount !== undefined ? audioConfig.reverbAmount : preset.reverbAmount;
+    dryGain.gain.value = 1 - reverbAmount;
+    reverbGain.gain.value = reverbAmount;
     
     // Filter settings
     filter.type = 'lowpass';

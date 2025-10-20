@@ -129,6 +129,22 @@ function initSettingsControls() {
         window.analytics?.trackAudioPresetChange(e.target.value);
     });
     
+    // Reverb control
+    const reverbSlider = document.getElementById('reverbSlider');
+    const reverbValue = document.getElementById('reverbValue');
+    
+    reverbSlider?.addEventListener('input', (e) => {
+        const reverb = e.target.value / 100;
+        window.audioConfig.reverbAmount = reverb;
+        reverbValue.textContent = e.target.value + '%';
+    });
+    
+    reverbSlider?.addEventListener('change', (e) => {
+        window.analytics?.track('reverb_change', { 
+            reverb_level: Math.round(e.target.value / 10) * 10 + '%'
+        });
+    });
+    
     // Text explosions
     const textInput = document.getElementById('textInput');
     const launchTextBtn = document.getElementById('launchTextBtn');
@@ -441,6 +457,15 @@ function updateUIFromConfig() {
     const audioPresetSelect = document.getElementById('audioPreset');
     if (audioPresetSelect && window.audioConfig) {
         audioPresetSelect.value = window.audioConfig.preset;
+    }
+    
+    // Update reverb
+    const reverbSlider = document.getElementById('reverbSlider');
+    const reverbValue = document.getElementById('reverbValue');
+    if (reverbSlider && window.audioConfig && window.audioConfig.reverbAmount !== undefined) {
+        const reverb = Math.round(window.audioConfig.reverbAmount * 100);
+        reverbSlider.value = reverb;
+        reverbValue.textContent = reverb + '%';
     }
 }
 

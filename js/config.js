@@ -188,6 +188,7 @@ function saveConfiguration(name) {
         explosionType: window.selectedExplosionType || 'random',
         audioPreset: window.audioConfig?.preset || 'balanced',
         volume: window.audioConfig?.volume || 0.5,
+        reverbAmount: window.audioConfig?.reverbAmount !== undefined ? window.audioConfig.reverbAmount : 0.4,
         timestamp: Date.now()
     };
     localStorage.setItem('fireworksConfigs', JSON.stringify(savedConfigs));
@@ -203,7 +204,13 @@ function loadConfiguration(name) {
         if (window.audioConfig) {
             window.audioConfig.preset = cfg.audioPreset;
             window.audioConfig.volume = cfg.volume;
+            if (cfg.reverbAmount !== undefined) {
+                window.audioConfig.reverbAmount = cfg.reverbAmount;
+            }
         }
+        
+        // Update UI
+        updateUIFromConfig();
         return true;
     }
     return false;
