@@ -24,34 +24,47 @@ const audioConfig = {
 // Simplified presets - easy to understand
 const audioPresets = {
     realistic: {
+        useSamples: true,
         volumeMultiplier: 1.0,
         reverbAmount: 0.4,
         playbackRateVariation: 0.1,
         distanceFalloff: 0.5
     },
     epic: {
+        useSamples: true,
         volumeMultiplier: 1.2,
         reverbAmount: 0.7,
         playbackRateVariation: 0.05,
         distanceFalloff: 0.3
     },
     minimal: {
+        useSamples: true,
         volumeMultiplier: 0.7,
         reverbAmount: 0.15,
         playbackRateVariation: 0.05,
         distanceFalloff: 0.7
     },
     cartoonish: {
+        useSamples: true,
         volumeMultiplier: 1.0,
         reverbAmount: 0.2,
         playbackRateVariation: 0.15,
         distanceFalloff: 0.4
     },
     balanced: {
+        useSamples: true,
         volumeMultiplier: 0.9,
         reverbAmount: 0.3,
         playbackRateVariation: 0.08,
         distanceFalloff: 0.45
+    },
+    synthesized: {
+        useSamples: false,
+        volumeMultiplier: 1.0,
+        reverbAmount: 0.4,
+        playbackRateVariation: 0,
+        distanceFalloff: 0.5,
+        cracklingIntensity: 0.3
     }
 };
 
@@ -168,13 +181,13 @@ function getDistanceVolume(x, y) {
 function playExplosionSound(x, y) {
     if (!audioContext || !audioConfig.enabled) return;
     
-    // Use fallback if samples not loaded
-    if (audioSamples.useFallback || audioSamples.explosion.length === 0) {
+    const preset = audioPresets[audioConfig.preset];
+    
+    // Use synthesis if preset specifies or samples not available
+    if (!preset.useSamples || audioSamples.useFallback || audioSamples.explosion.length === 0) {
         playExplosionSoundFallback(x, y);
         return;
     }
-    
-    const preset = audioPresets[audioConfig.preset];
     
     // Select random sample
     const sampleIndex = Math.floor(Math.random() * audioSamples.explosion.length);
@@ -267,6 +280,42 @@ function playExplosionSoundFallback(x, y) {
     
     noise.start(audioContext.currentTime);
     noise.stop(audioContext.currentTime + 0.3);
+    
+    // Add crackling for synthesized preset
+    if (preset.cracklingIntensity && preset.cracklingIntensity > 0) {
+        playCracklingSound(x, y, preset.cracklingIntensity);
+    }
+}
+
+// Crackling/popping particle sounds (for synthesized preset)
+function playCracklingSound(x, y, intensity) {
+    if (!audioContext || intensity === 0) return;
+    
+    const crackleCount = Math.floor(Math.random() * 5 + 3) * intensity;
+    const distanceVolume = getDistanceVolume(x, y);
+    
+    for (let i = 0; i < crackleCount; i++) {
+        setTimeout(() => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const panner = createPanner(x + (Math.random() - 0.5) * 100);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(panner);
+            panner.connect(masterGain);
+            
+            const freq = Math.random() * 2000 + 3000;
+            oscillator.frequency.value = freq;
+            oscillator.type = 'square';
+            
+            const volume = (Math.random() * 0.05 + 0.02) * intensity * distanceVolume;
+            gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.05);
+        }, Math.random() * 200 + 50);
+    }
 }
 
 // Play launch sound using sample
