@@ -8,10 +8,41 @@
 </head>
 <body>
     <canvas id="fireworksCanvas"></canvas>
+    
     <div class="controls">
-        <button id="autoLaunch">Auto Launch</button>
-        <div class="info">Click anywhere to launch fireworks!</div>
+        <button id="autoLaunch" class="btn-primary">Auto Launch</button>
+        <button id="settingsToggle" class="btn-secondary">⚙️</button>
     </div>
+    
+    <div id="settingsPanel" class="settings-panel hidden">
+        <h3>Settings</h3>
+        
+        <div class="setting-group">
+            <label>Background</label>
+            <div class="button-group">
+                <button class="bg-option active" data-bg="starry">⭐ Starry</button>
+                <button class="bg-option" data-bg="city">🏙️ City</button>
+                <button class="bg-option" data-bg="black">⬛ Black</button>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <label>Explosion Type</label>
+            <select id="explosionType">
+                <option value="random">🎲 Random</option>
+                <option value="standard">💥 Standard</option>
+                <option value="willow">🌿 Willow</option>
+                <option value="chrysanthemum">🌸 Chrysanthemum</option>
+                <option value="palm">🌴 Palm</option>
+                <option value="star">⭐ Star</option>
+                <option value="heart">❤️ Heart</option>
+                <option value="ring">⭕ Ring</option>
+            </select>
+        </div>
+        
+        <div class="info">Tap anywhere to launch!</div>
+    </div>
+    
     <script src="app.js"></script>
 </body>
 </html>
