@@ -116,10 +116,10 @@ window.fireworkConfig = {
 }
 ```
 
-### Priority 2: Add New Shapes (3-4 hours)
+### Priority 2: Add New Shapes (3-4 hours) ✅ COMPLETE
 
-#### 2.1 Spiral Shape
-Particles rotate outward in spiral pattern
+#### 2.1 Spiral Shape ✅
+Particles rotate outward in spiral pattern (Completed in Priority 1)
 ```javascript
 spiral: (count) => {
     const particles = [];
@@ -136,23 +136,26 @@ spiral: (count) => {
 }
 ```
 
-#### 2.2 Crossette Shape
+#### 2.2 Crossette Shape ✅
 Particles split into smaller bursts
-- Initial burst
-- Secondary explosions mid-flight
-- More complex effect
+- 8 cluster directions
+- Spread within each cluster
+- Split burst pattern effect
+- Icon: ✨
 
-#### 2.3 Peony Shape
+#### 2.3 Peony Shape ✅
 Dense center, sparse edges
+- Gaussian distribution for speed
 - More particles in center
-- Fewer at edges
 - Classic firework look
+- Icon: 🌺
 
-#### 2.4 Double Ring
+#### 2.4 Double Ring ✅
 Two concentric rings
-- Inner ring smaller/faster
-- Outer ring larger/slower
+- Inner ring: 40% particles, faster (speed 5)
+- Outer ring: 60% particles, slower (speed 3)
 - Beautiful layered effect
+- Icon: ⭕⭕
 
 ### Priority 3: Audio Variation (2 hours)
 

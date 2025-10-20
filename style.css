@@ -699,8 +699,14 @@ select option {
 /* Firework Style Grid Selector */
 .style-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 8px;
+}
+
+@media (max-width: 480px) {
+    .style-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 .style-btn {

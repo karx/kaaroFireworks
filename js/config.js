@@ -106,6 +106,76 @@ const explosionShapes = {
             });
         }
         return particles;
+    },
+    
+    crossette: (count) => {
+        // Split burst pattern - clusters that spread apart
+        const particles = [];
+        const clusters = 8; // Number of split directions
+        const particlesPerCluster = Math.floor(count / clusters);
+        
+        for (let c = 0; c < clusters; c++) {
+            const clusterAngle = (c / clusters) * Math.PI * 2;
+            const clusterSpeed = 3 + Math.random() * 2;
+            
+            for (let i = 0; i < particlesPerCluster; i++) {
+                // Add spread within cluster
+                const spread = (Math.random() - 0.5) * 0.6;
+                const speedVariation = 0.8 + Math.random() * 0.4;
+                particles.push({
+                    vx: Math.cos(clusterAngle + spread) * clusterSpeed * speedVariation,
+                    vy: Math.sin(clusterAngle + spread) * clusterSpeed * speedVariation
+                });
+            }
+        }
+        return particles;
+    },
+    
+    peony: (count) => {
+        // Dense center, sparse edges - classic firework
+        const particles = [];
+        for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            // Use gaussian-like distribution for speed (more particles slower/center)
+            const rand1 = Math.random();
+            const rand2 = Math.random();
+            const gaussian = Math.sqrt(-2 * Math.log(rand1)) * Math.cos(2 * Math.PI * rand2);
+            const speed = Math.abs(gaussian) * 2 + 1; // Center around 1-5
+            particles.push({
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed
+            });
+        }
+        return particles;
+    },
+    
+    doubleRing: (count) => {
+        // Two concentric rings
+        const particles = [];
+        const innerCount = Math.floor(count * 0.4);
+        const outerCount = count - innerCount;
+        
+        // Inner ring - faster, smaller
+        for (let i = 0; i < innerCount; i++) {
+            const angle = (i / innerCount) * Math.PI * 2;
+            const speed = 5 + Math.random() * 0.5;
+            particles.push({
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed
+            });
+        }
+        
+        // Outer ring - slower, larger
+        for (let i = 0; i < outerCount; i++) {
+            const angle = (i / outerCount) * Math.PI * 2;
+            const speed = 3 + Math.random() * 0.5;
+            particles.push({
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed
+            });
+        }
+        
+        return particles;
     }
 };
 
@@ -181,6 +251,33 @@ const fireworkStyles = {
         shape: 'spiral',
         colors: 2,
         trail: true,
+        gravity: 0.05
+    },
+    crossette: {
+        name: 'Crossette',
+        icon: '✨',
+        description: 'Split bursts',
+        shape: 'crossette',
+        colors: 2,
+        trail: true,
+        gravity: 0.06
+    },
+    peony: {
+        name: 'Peony',
+        icon: '🌺',
+        description: 'Dense center',
+        shape: 'peony',
+        colors: 2,
+        trail: false,
+        gravity: 0.05
+    },
+    doubleRing: {
+        name: 'Double Ring',
+        icon: '⭕⭕',
+        description: 'Concentric circles',
+        shape: 'doubleRing',
+        colors: 3,
+        trail: false,
         gravity: 0.05
     }
 };
