@@ -1,7 +1,7 @@
 // UI module
 // Handles all UI controls, panels, and user interactions
 
-let selectedExplosionType = 'random';
+let selectedFireworkStyle = 'random';
 let autoLaunchInterval = null;
 
 // Initialize UI
@@ -97,11 +97,18 @@ function initSettingsControls() {
         });
     });
     
-    // Explosion type selection
-    const explosionTypeSelect = document.getElementById('explosionType');
-    explosionTypeSelect?.addEventListener('change', (e) => {
-        selectedExplosionType = e.target.value;
-        window.analytics?.trackExplosionTypeChange(selectedExplosionType);
+    // Firework style selection (visual grid)
+    const styleButtons = document.querySelectorAll('.style-btn');
+    styleButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active class from all buttons
+            styleButtons.forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            btn.classList.add('active');
+            // Update selected style
+            selectedFireworkStyle = btn.dataset.style;
+            window.analytics?.trackExplosionTypeChange(selectedFireworkStyle);
+        });
     });
     
     // Volume control
@@ -438,11 +445,10 @@ function updateUIFromConfig() {
         btn.classList.toggle('active', btn.dataset.bg === window.config.background);
     });
     
-    // Update explosion type
-    const explosionTypeSelect = document.getElementById('explosionType');
-    if (explosionTypeSelect) {
-        explosionTypeSelect.value = selectedExplosionType;
-    }
+    // Update firework style buttons
+    document.querySelectorAll('.style-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.style === selectedFireworkStyle);
+    });
     
     // Update volume
     const volumeSlider = document.getElementById('volumeSlider');
@@ -478,7 +484,7 @@ function initUserInteraction() {
         // Broadcast to room if connected
         if (window.syncState?.isConnected && window.broadcastFirework) {
             window.broadcastFirework(e.clientX, e.clientY, 'firework', {
-                explosionType: window.selectedExplosionType || 'random'
+                explosionType: window.selectedFireworkStyle || 'random'
             });
         }
     });
@@ -492,7 +498,7 @@ function initUserInteraction() {
         // Broadcast to room if connected
         if (window.syncState?.isConnected && window.broadcastFirework) {
             window.broadcastFirework(touch.clientX, touch.clientY, 'firework', {
-                explosionType: window.selectedExplosionType || 'random'
+                explosionType: window.selectedFireworkStyle || 'random'
             });
         }
     });
@@ -503,7 +509,7 @@ function loadURLConfig() {
     const urlConfig = window.getConfigFromURL();
     if (urlConfig) {
         if (urlConfig.background) window.config.background = urlConfig.background;
-        if (urlConfig.explosionType) selectedExplosionType = urlConfig.explosionType;
+        if (urlConfig.explosionType) selectedFireworkStyle = urlConfig.explosionType;
         if (urlConfig.audioPreset && window.audioConfig) window.audioConfig.preset = urlConfig.audioPreset;
         if (urlConfig.volume !== undefined && window.audioConfig) window.audioConfig.volume = urlConfig.volume;
         updateUIFromConfig();
@@ -624,7 +630,8 @@ function initSyncControls() {
 }
 
 // Export for global access
-window.selectedExplosionType = selectedExplosionType;
+window.selectedFireworkStyle = selectedFireworkStyle;
+window.selectedExplosionType = selectedFireworkStyle; // Legacy support
 window.updateUIFromConfig = updateUIFromConfig;
 window.initUI = initUI;
 window.initUserInteraction = initUserInteraction;

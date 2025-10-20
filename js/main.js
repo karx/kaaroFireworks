@@ -43,8 +43,8 @@ function animate() {
         
         if (exploded) {
             window.fireworks.splice(i, 1);
-            const type = window.selectedExplosionType || 'random';
-            window.createExplosion(firework.x, firework.y, type);
+            const style = window.selectedFireworkStyle || 'random';
+            window.createExplosion(firework.x, firework.y, style);
         }
     }
     

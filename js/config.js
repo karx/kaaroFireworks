@@ -29,7 +29,7 @@ if (config.isMobile) {
     config.particleSize = 2;
 }
 
-// Explosion shapes
+// Explosion shapes - geometric patterns for particles
 const explosionShapes = {
     sphere: (count) => {
         const particles = [];
@@ -90,19 +90,103 @@ const explosionShapes = {
             });
         }
         return particles;
+    },
+    
+    spiral: (count) => {
+        const particles = [];
+        const rotations = 3;
+        for (let i = 0; i < count; i++) {
+            const progress = i / count;
+            const angle = progress * Math.PI * 2 * rotations;
+            const radius = progress * 5 + 2;
+            const speed = 1 + Math.random() * 0.5;
+            particles.push({
+                vx: Math.cos(angle) * radius * speed,
+                vy: Math.sin(angle) * radius * speed
+            });
+        }
+        return particles;
     }
 };
 
-// Explosion types
-const explosionTypes = {
-    standard: { shape: 'sphere', colors: 1, trail: false },
-    willow: { shape: 'sphere', colors: 1, trail: true, gravity: 0.08 },
-    chrysanthemum: { shape: 'sphere', colors: 3, trail: true },
-    palm: { shape: 'sphere', colors: 2, trail: true, gravity: 0.12 },
-    star: { shape: 'star', colors: 1, trail: false },
-    heart: { shape: 'heart', colors: 1, trail: false },
-    ring: { shape: 'ring', colors: 2, trail: false }
+// Firework Styles - unified system combining shape and visual effects
+const fireworkStyles = {
+    sphere: {
+        name: 'Sphere',
+        icon: '💥',
+        description: 'Classic burst',
+        shape: 'sphere',
+        colors: 1,
+        trail: false,
+        gravity: 0.05
+    },
+    star: {
+        name: 'Star',
+        icon: '⭐',
+        description: '5-pointed star',
+        shape: 'star',
+        colors: 1,
+        trail: false,
+        gravity: 0.05
+    },
+    heart: {
+        name: 'Heart',
+        icon: '❤️',
+        description: 'Romantic heart',
+        shape: 'heart',
+        colors: 1,
+        trail: false,
+        gravity: 0.05
+    },
+    ring: {
+        name: 'Ring',
+        icon: '⭕',
+        description: 'Perfect circle',
+        shape: 'ring',
+        colors: 2,
+        trail: false,
+        gravity: 0.05
+    },
+    willow: {
+        name: 'Willow',
+        icon: '🌿',
+        description: 'Drooping trails',
+        shape: 'sphere',
+        colors: 1,
+        trail: true,
+        gravity: 0.08
+    },
+    chrysanthemum: {
+        name: 'Chrysanthemum',
+        icon: '🌸',
+        description: 'Multi-burst',
+        shape: 'sphere',
+        colors: 3,
+        trail: true,
+        gravity: 0.05
+    },
+    palm: {
+        name: 'Palm',
+        icon: '🌴',
+        description: 'Palm tree effect',
+        shape: 'sphere',
+        colors: 2,
+        trail: true,
+        gravity: 0.12
+    },
+    spiral: {
+        name: 'Spiral',
+        icon: '🌀',
+        description: 'Rotating burst',
+        shape: 'spiral',
+        colors: 2,
+        trail: true,
+        gravity: 0.05
+    }
 };
+
+// Legacy support - map old explosionTypes to new fireworkStyles
+const explosionTypes = fireworkStyles;
 
 // Preset shows
 const presetShows = {
@@ -170,7 +254,7 @@ function getConfigFromURL() {
 function generateShareURL() {
     const shareConfig = {
         background: config.background,
-        explosionType: window.selectedExplosionType || 'random',
+        explosionType: window.selectedFireworkStyle || 'random',
         audioPreset: window.audioConfig?.preset || 'balanced',
         volume: window.audioConfig?.volume || 0.5
     };
@@ -185,7 +269,7 @@ function saveConfiguration(name) {
     const savedConfigs = JSON.parse(localStorage.getItem('fireworksConfigs') || '{}');
     savedConfigs[name] = {
         background: config.background,
-        explosionType: window.selectedExplosionType || 'random',
+        explosionType: window.selectedFireworkStyle || 'random',
         audioPreset: window.audioConfig?.preset || 'balanced',
         volume: window.audioConfig?.volume || 0.5,
         reverbAmount: window.audioConfig?.reverbAmount !== undefined ? window.audioConfig.reverbAmount : 0.4,
@@ -200,7 +284,7 @@ function loadConfiguration(name) {
     if (savedConfigs[name]) {
         const cfg = savedConfigs[name];
         config.background = cfg.background;
-        if (window.selectedExplosionType !== undefined) window.selectedExplosionType = cfg.explosionType;
+        if (window.selectedFireworkStyle !== undefined) window.selectedFireworkStyle = cfg.explosionType;
         if (window.audioConfig) {
             window.audioConfig.preset = cfg.audioPreset;
             window.audioConfig.volume = cfg.volume;
@@ -284,7 +368,8 @@ window.canvas = canvas;
 window.ctx = ctx;
 window.config = config;
 window.explosionShapes = explosionShapes;
-window.explosionTypes = explosionTypes;
+window.fireworkStyles = fireworkStyles;
+window.explosionTypes = explosionTypes; // Legacy support
 window.presetShows = presetShows;
 window.getConfigFromURL = getConfigFromURL;
 window.generateShareURL = generateShareURL;

@@ -164,16 +164,18 @@ class Firework {
 }
 
 // Create explosion at position
-function createExplosion(x, y, type = null) {
+function createExplosion(x, y, style = null) {
     window.playExplosionSound(x, y);
     
-    if (!type || type === 'random') {
-        const types = Object.keys(window.explosionTypes);
-        type = types[Math.floor(Math.random() * types.length)];
+    // Select random style if not specified
+    if (!style || style === 'random') {
+        const styles = Object.keys(window.fireworkStyles);
+        style = styles[Math.floor(Math.random() * styles.length)];
     }
     
-    const explosionConfig = window.explosionTypes[type];
-    const shape = window.explosionShapes[explosionConfig.shape];
+    // Get style configuration
+    const styleConfig = window.fireworkStyles[style];
+    const shape = window.explosionShapes[styleConfig.shape];
     
     // Adjust particle count based on performance
     let particleCount = window.config.particleCount;
@@ -187,7 +189,7 @@ function createExplosion(x, y, type = null) {
     
     // Get colors
     const colors = [];
-    for (let i = 0; i < explosionConfig.colors; i++) {
+    for (let i = 0; i < styleConfig.colors; i++) {
         colors.push(window.config.colors[Math.floor(Math.random() * window.config.colors.length)]);
     }
     
@@ -196,9 +198,9 @@ function createExplosion(x, y, type = null) {
         const color = colors[Math.floor(Math.random() * colors.length)];
         const particle = window.particlePool.get();
         particle.init(x, y, color, velocity.vx, velocity.vy, {
-            trail: explosionConfig.trail && !window.performanceConfig.reducedMotion,
-            gravity: explosionConfig.gravity,
-            colorTransition: explosionConfig.colors > 1
+            trail: styleConfig.trail && !window.performanceConfig.reducedMotion,
+            gravity: styleConfig.gravity,
+            colorTransition: styleConfig.colors > 1
         });
         particles.push(particle);
     }
@@ -212,7 +214,7 @@ function launchFirework(targetX, targetY) {
     
     // Track firework launch
     window.analytics?.trackFireworkLaunch(
-        window.selectedExplosionType || 'random',
+        window.selectedFireworkStyle || 'random',
         window.config?.isMobile || false
     );
 }
@@ -234,10 +236,10 @@ function playPresetShow(showName) {
             const x = event.x * window.canvas.width;
             const y = event.y * window.canvas.height;
             
-            const originalType = window.selectedExplosionType;
-            window.selectedExplosionType = event.type;
+            const originalStyle = window.selectedFireworkStyle;
+            window.selectedFireworkStyle = event.type;
             launchFirework(x, y);
-            window.selectedExplosionType = originalType;
+            window.selectedFireworkStyle = originalStyle;
         }, event.delay);
         
         showTimeouts.push(timeout);
