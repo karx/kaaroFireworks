@@ -971,21 +971,65 @@ autoLaunchBtn.addEventListener('click', () => {
 // Settings panel controls
 const settingsToggle = document.getElementById('settingsToggle');
 const settingsPanel = document.getElementById('settingsPanel');
+const settingsClose = document.getElementById('settingsClose');
 const shareToggle = document.getElementById('shareToggle');
 const sharePanel = document.getElementById('sharePanel');
+const shareClose = document.getElementById('shareClose');
+const panelBackdrop = document.getElementById('panelBackdrop');
 const bgOptions = document.querySelectorAll('.bg-option');
 const explosionTypeSelect = document.getElementById('explosionType');
 
 let selectedExplosionType = 'random';
 
-settingsToggle.addEventListener('click', () => {
-    settingsPanel.classList.toggle('hidden');
+function closePanels() {
+    settingsPanel.classList.add('hidden');
     sharePanel.classList.add('hidden');
+    panelBackdrop.classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+function openPanel(panel) {
+    closePanels();
+    panel.classList.remove('hidden');
+    panelBackdrop.classList.remove('hidden');
+    
+    // Prevent body scroll on mobile when panel is open
+    if (window.innerWidth < 768) {
+        document.body.style.overflow = 'hidden';
+    }
+    
+    // Scroll panel to top
+    panel.scrollTop = 0;
+}
+
+settingsToggle.addEventListener('click', () => {
+    if (settingsPanel.classList.contains('hidden')) {
+        openPanel(settingsPanel);
+    } else {
+        closePanels();
+    }
+});
+
+settingsClose.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closePanels();
 });
 
 shareToggle.addEventListener('click', () => {
-    sharePanel.classList.toggle('hidden');
-    settingsPanel.classList.add('hidden');
+    if (sharePanel.classList.contains('hidden')) {
+        openPanel(sharePanel);
+    } else {
+        closePanels();
+    }
+});
+
+shareClose.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closePanels();
+});
+
+panelBackdrop.addEventListener('click', () => {
+    closePanels();
 });
 
 // Background selection

@@ -92,14 +92,20 @@
 <body>
     <canvas id="fireworksCanvas"></canvas>
     
+    <div id="panelBackdrop" class="panel-backdrop hidden"></div>
+    
     <div class="controls">
         <button id="autoLaunch" class="btn-primary">Auto Launch</button>
         <button id="settingsToggle" class="btn-secondary">⚙️</button>
         <button id="shareToggle" class="btn-secondary">📤</button>
+        <a href="about.html" class="btn-secondary about-link" title="About">ℹ️</a>
     </div>
     
     <div id="settingsPanel" class="settings-panel hidden">
-        <h3>Settings</h3>
+        <div class="panel-header">
+            <h3>Settings</h3>
+            <button class="panel-close" id="settingsClose">✕</button>
+        </div>
         
         <div class="setting-group">
             <label>Background</label>
@@ -142,7 +148,10 @@
     </div>
     
     <div id="sharePanel" class="settings-panel hidden">
-        <h3>Share & Save</h3>
+        <div class="panel-header">
+            <h3>Share & Save</h3>
+            <button class="panel-close" id="shareClose">✕</button>
+        </div>
         
         <div class="setting-group">
             <label>Quick Actions</label>

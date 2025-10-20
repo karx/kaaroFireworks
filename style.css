@@ -18,6 +18,24 @@ body {
     touch-action: none;
 }
 
+/* Panel Backdrop */
+.panel-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.panel-backdrop.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
 /* Mobile-first controls */
 .controls {
     position: fixed;
@@ -61,6 +79,13 @@ button:active {
     font-size: 18px;
 }
 
+.about-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Settings Panel */
 .settings-panel {
     position: fixed;
@@ -68,13 +93,36 @@ button:active {
     right: 12px;
     width: calc(100vw - 24px);
     max-width: 320px;
-    background: rgba(0, 0, 0, 0.9);
+    max-height: calc(100vh - 80px);
+    background: rgba(0, 0, 0, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
     padding: 16px;
-    z-index: 9;
+    z-index: 1001;
     backdrop-filter: blur(20px);
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+.settings-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.settings-panel::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.settings-panel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.settings-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .settings-panel.hidden {
@@ -83,11 +131,47 @@ button:active {
     transform: translateY(-10px);
 }
 
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .settings-panel h3 {
     color: white;
     font-size: 16px;
-    margin-bottom: 16px;
+    margin: 0;
     font-weight: 600;
+}
+
+.panel-close {
+    background: rgba(255, 100, 100, 0.2);
+    border: 1px solid rgba(255, 100, 100, 0.4);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.panel-close:hover {
+    background: rgba(255, 100, 100, 0.3);
+    border-color: rgba(255, 100, 100, 0.6);
+    transform: scale(1.1);
+}
+
+.panel-close:active {
+    transform: scale(0.95);
 }
 
 .setting-group {
@@ -209,6 +293,28 @@ select option {
 #sharePanel {
     top: 60px;
     right: 12px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+#sharePanel::-webkit-scrollbar {
+    width: 6px;
+}
+
+#sharePanel::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+#sharePanel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+#sharePanel::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .button-group-vertical {
@@ -367,6 +473,28 @@ select option {
     font-weight: 500;
 }
 
+/* Mobile specific adjustments */
+@media (max-width: 767px) {
+    .settings-panel {
+        width: calc(100vw - 24px);
+        max-width: none;
+        left: 12px;
+        right: 12px;
+        top: 70px;
+    }
+    
+    #sharePanel {
+        width: calc(100vw - 24px);
+        max-width: none;
+        left: 12px;
+        right: 12px;
+    }
+    
+    .panel-backdrop {
+        backdrop-filter: blur(2px);
+    }
+}
+
 /* Desktop adjustments */
 @media (min-width: 768px) {
     .controls {
@@ -401,5 +529,9 @@ select option {
     
     .bg-option:hover {
         background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .panel-backdrop {
+        display: none;
     }
 }
