@@ -165,13 +165,14 @@ class Firework {
 
 // Create explosion at position
 function createExplosion(x, y, style = null) {
-    window.playExplosionSound(x, y);
-    
     // Select random style if not specified
     if (!style || style === 'random') {
         const styles = Object.keys(window.fireworkStyles);
         style = styles[Math.floor(Math.random() * styles.length)];
     }
+    
+    // Play style-specific explosion sound
+    window.playExplosionSound(x, y, style);
     
     // Get style configuration
     const styleConfig = window.fireworkStyles[style];
