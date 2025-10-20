@@ -6,7 +6,7 @@
     
     <!-- Primary Meta Tags -->
     <title>Kaaro Fireworks - Interactive Canvas Fireworks Experience</title>
-    <meta name="title" content="Kaaro Fireworks - Interactive Canvas Fireworks Experience">
+    <meta name="title" content="Digital Diwali is Green Diwali.">
     <meta name="description" content="Wishing you all a very Happy Diwali from Arora Family.">
     <meta name="keywords" content="fireworks, interactive, canvas, javascript, animation, web audio, fireworks simulator, online fireworks, virtual fireworks, celebration">
     <meta name="author" content="Kaaro">
@@ -16,10 +16,10 @@
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kaarofireworks.netlify.app/">
-    <meta property="og:title" content="Kaaro Fireworks - Interactive Canvas Fireworks Experience">
-    <meta property="og:description" content="Experience stunning interactive fireworks in your browser! Custom shapes, immersive audio, and mobile-optimized. Click anywhere to launch beautiful fireworks.">
-    <meta property="og:image" content="https://kaarofireworks.netlify.app/OG-image-2.png">
+    <meta property="og:url" content="https://pattaka.netlify.app/">
+    <meta property="og:title" content="Digital Diwali is Green Diwali">
+    <meta property="og:description" content="Wishing you all a very Happy Diwali from Arora Family.">
+    <meta property="og:image" content="https://pattaka.netlify.app/og_image-4.png">
     <meta property="og:image:width" content="1024">
     <meta property="og:image:height" content="1024">
     <meta property="og:image:alt" content="Kaaro Fireworks - Interactive fireworks display with colorful explosions">
@@ -28,10 +28,12 @@
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://kaarofireworks.netlify.app/">
-    <meta property="twitter:title" content="Kaaro Fireworks - Interactive Canvas Fireworks Experience">
+    <meta property="twitter:url" content="https://pattaka.netlify.app/">
+    <meta property="twitter:title" content="Digital Diwali is Green Diwali">
+    <meta property="twitter:description" content="Wishing you all a very Happy Diwali from Arora Family.">
+    
     <meta property="twitter:description" content="Experience stunning interactive fireworks in your browser! Custom shapes, immersive audio, and mobile-optimized. Click anywhere to launch beautiful fireworks.">
-    <meta property="twitter:image" content="https://kaarofireworks.netlify.app/og-image.svg">
+    <meta property="twitter:image" content="https://pattaka.netlify.app/og_image-4.png">
     <meta property="twitter:image:alt" content="Kaaro Fireworks - Interactive fireworks display">
     
     <!-- Favicon -->
@@ -40,7 +42,7 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://kaarofireworks.netlify.app/">
+    <link rel="canonical" href="https://pattaka.netlify.app/">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -55,7 +57,7 @@
       "@type": "WebApplication",
       "name": "Kaaro Fireworks",
       "description": "Interactive canvas-based fireworks simulator with custom shapes, immersive audio, and mobile optimization. Experience realistic fireworks physics and sound effects in your browser.",
-      "url": "https://kaarofireworks.netlify.app/",
+      "url": "https://pattaka.netlify.app/",
       "applicationCategory": "EntertainmentApplication",
       "operatingSystem": "Any",
       "offers": {
@@ -63,7 +65,7 @@
         "price": "0",
         "priceCurrency": "USD"
       },
-      "screenshot": "https://kaarofireworks.netlify.app/og-image.svg",
+      "screenshot": "https://pattaka.netlify.app/og_image-4.png",
       "author": {
         "@type": "Person",
         "name": "Kaaro"
@@ -93,6 +95,7 @@
     <div class="controls">
         <button id="autoLaunch" class="btn-primary">Auto Launch</button>
         <button id="settingsToggle" class="btn-secondary">⚙️</button>
+        <button id="shareToggle" class="btn-secondary">📤</button>
     </div>
     
     <div id="settingsPanel" class="settings-panel hidden">
@@ -136,6 +139,47 @@
         </div>
         
         <div class="info">Tap anywhere to launch!</div>
+    </div>
+    
+    <div id="sharePanel" class="settings-panel hidden">
+        <h3>Share & Save</h3>
+        
+        <div class="setting-group">
+            <label>Quick Actions</label>
+            <div class="button-group-vertical">
+                <button id="captureBtn" class="action-btn">📸 Capture Screenshot</button>
+                <button id="copyLinkBtn" class="action-btn">🔗 Copy Share Link</button>
+                <button id="qrCodeBtn" class="action-btn">📱 Show QR Code</button>
+                <button id="shareBtn" class="action-btn">🚀 Share</button>
+            </div>
+        </div>
+        
+        <div id="qrCodeContainer" class="qr-code-container hidden">
+            <canvas id="qrCanvas" width="200" height="200"></canvas>
+            <div class="qr-label">Scan to share</div>
+        </div>
+        
+        <div class="setting-group">
+            <label>Preset Shows</label>
+            <div class="button-group-vertical">
+                <button class="show-btn" data-show="rainbow">🌈 Rainbow</button>
+                <button class="show-btn" data-show="cascade">💧 Cascade</button>
+                <button class="show-btn" data-show="finale">🎆 Finale</button>
+                <button class="show-btn" data-show="symmetry">⚖️ Symmetry</button>
+                <button class="show-btn" data-show="celebration">🎉 Celebration</button>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <label>Save Configuration</label>
+            <div class="save-config-group">
+                <input type="text" id="configName" placeholder="My Config" maxlength="20">
+                <button id="saveConfigBtn" class="action-btn-small">💾 Save</button>
+            </div>
+            <div id="savedConfigsList" class="saved-configs-list"></div>
+        </div>
+        
+        <div id="shareMessage" class="share-message hidden"></div>
     </div>
     
     <script src="app.js"></script>

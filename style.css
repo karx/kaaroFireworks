@@ -205,6 +205,168 @@ select option {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+/* Share Panel */
+#sharePanel {
+    top: 60px;
+    right: 12px;
+}
+
+.button-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.action-btn, .show-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover, .show-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.action-btn:active, .show-btn:active {
+    transform: scale(0.98);
+}
+
+.show-btn.playing {
+    background: rgba(100, 255, 100, 0.2);
+    border-color: rgba(100, 255, 100, 0.5);
+}
+
+.save-config-group {
+    display: flex;
+    gap: 8px;
+}
+
+.save-config-group input {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-family: inherit;
+}
+
+.save-config-group input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.action-btn-small {
+    padding: 10px 16px;
+    font-size: 14px;
+    background: rgba(100, 100, 255, 0.3);
+    color: white;
+    border: 1px solid rgba(100, 100, 255, 0.5);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.action-btn-small:hover {
+    background: rgba(100, 100, 255, 0.4);
+}
+
+.saved-configs-list {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.saved-config-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.saved-config-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.saved-config-name {
+    color: white;
+    cursor: pointer;
+    flex: 1;
+}
+
+.saved-config-delete {
+    color: rgba(255, 100, 100, 0.8);
+    cursor: pointer;
+    padding: 4px 8px;
+    font-size: 16px;
+}
+
+.saved-config-delete:hover {
+    color: rgba(255, 100, 100, 1);
+}
+
+.share-message {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.share-message.success {
+    background: rgba(100, 255, 100, 0.2);
+    border: 1px solid rgba(100, 255, 100, 0.5);
+    color: #99ff99;
+}
+
+.share-message.error {
+    background: rgba(255, 100, 100, 0.2);
+    border: 1px solid rgba(255, 100, 100, 0.5);
+    color: #ff9999;
+}
+
+.qr-code-container {
+    margin-top: 16px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.qr-code-container.hidden {
+    display: none;
+}
+
+#qrCanvas {
+    border-radius: 8px;
+}
+
+.qr-label {
+    color: #333;
+    font-size: 13px;
+    font-weight: 500;
+}
+
 /* Desktop adjustments */
 @media (min-width: 768px) {
     .controls {

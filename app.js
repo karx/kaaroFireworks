@@ -20,6 +20,230 @@ const config = {
     isMobile: window.innerWidth < 768
 };
 
+// URL-based configuration sharing
+function getConfigFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    
+    if (params.has('config')) {
+        try {
+            const encoded = params.get('config');
+            const decoded = atob(encoded);
+            const urlConfig = JSON.parse(decoded);
+            
+            // Apply URL config
+            if (urlConfig.background) config.background = urlConfig.background;
+            if (urlConfig.explosionType) selectedExplosionType = urlConfig.explosionType;
+            if (urlConfig.audioPreset) audioConfig.preset = urlConfig.audioPreset;
+            if (urlConfig.volume !== undefined) audioConfig.volume = urlConfig.volume;
+            
+            return urlConfig;
+        } catch (e) {
+            console.error('Invalid config URL:', e);
+        }
+    }
+    return null;
+}
+
+function generateShareURL() {
+    const shareConfig = {
+        background: config.background,
+        explosionType: selectedExplosionType,
+        audioPreset: audioConfig.preset,
+        volume: audioConfig.volume
+    };
+    
+    const encoded = btoa(JSON.stringify(shareConfig));
+    const baseURL = window.location.origin + window.location.pathname;
+    return `${baseURL}?config=${encoded}`;
+}
+
+function saveConfiguration(name) {
+    const savedConfigs = JSON.parse(localStorage.getItem('fireworksConfigs') || '{}');
+    savedConfigs[name] = {
+        background: config.background,
+        explosionType: selectedExplosionType,
+        audioPreset: audioConfig.preset,
+        volume: audioConfig.volume,
+        timestamp: Date.now()
+    };
+    localStorage.setItem('fireworksConfigs', JSON.stringify(savedConfigs));
+    return Object.keys(savedConfigs).length;
+}
+
+function loadConfiguration(name) {
+    const savedConfigs = JSON.parse(localStorage.getItem('fireworksConfigs') || '{}');
+    if (savedConfigs[name]) {
+        const cfg = savedConfigs[name];
+        config.background = cfg.background;
+        selectedExplosionType = cfg.explosionType;
+        audioConfig.preset = cfg.audioPreset;
+        audioConfig.volume = cfg.volume;
+        
+        // Update UI
+        updateUIFromConfig();
+        return true;
+    }
+    return false;
+}
+
+function getSavedConfigurations() {
+    return JSON.parse(localStorage.getItem('fireworksConfigs') || '{}');
+}
+
+function deleteConfiguration(name) {
+    const savedConfigs = JSON.parse(localStorage.getItem('fireworksConfigs') || '{}');
+    delete savedConfigs[name];
+    localStorage.setItem('fireworksConfigs', JSON.stringify(savedConfigs));
+}
+
+// Screenshot capture
+function captureScreenshot() {
+    try {
+        // Create a temporary canvas with better quality
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Copy current canvas content
+        tempCtx.drawImage(canvas, 0, 0);
+        
+        // Add watermark
+        tempCtx.font = 'bold 24px Arial';
+        tempCtx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        tempCtx.textAlign = 'right';
+        tempCtx.fillText('Kaaro Fireworks', tempCanvas.width - 20, tempCanvas.height - 20);
+        
+        // Convert to blob and download
+        tempCanvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `kaaro-fireworks-${Date.now()}.png`;
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+        }, 'image/png');
+        
+        return true;
+    } catch (e) {
+        console.error('Screenshot failed:', e);
+        return false;
+    }
+}
+
+// Share screenshot to social media
+function shareScreenshot() {
+    try {
+        canvas.toBlob(async (blob) => {
+            const file = new File([blob], 'fireworks.png', { type: 'image/png' });
+            
+            if (navigator.share && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    title: 'Kaaro Fireworks',
+                    text: 'Check out my fireworks display!',
+                    files: [file],
+                    url: generateShareURL()
+                });
+            } else {
+                // Fallback: just download
+                captureScreenshot();
+            }
+        }, 'image/png');
+    } catch (e) {
+        console.error('Share failed:', e);
+        captureScreenshot(); // Fallback to download
+    }
+}
+
+// Preset shows - choreographed sequences
+const presetShows = {
+    rainbow: [
+        { delay: 0, x: 0.2, y: 0.3, type: 'standard' },
+        { delay: 300, x: 0.4, y: 0.25, type: 'star' },
+        { delay: 600, x: 0.6, y: 0.3, type: 'heart' },
+        { delay: 900, x: 0.8, y: 0.25, type: 'ring' },
+        { delay: 1200, x: 0.5, y: 0.2, type: 'chrysanthemum' }
+    ],
+    
+    cascade: [
+        { delay: 0, x: 0.1, y: 0.2, type: 'willow' },
+        { delay: 200, x: 0.3, y: 0.25, type: 'willow' },
+        { delay: 400, x: 0.5, y: 0.3, type: 'willow' },
+        { delay: 600, x: 0.7, y: 0.25, type: 'willow' },
+        { delay: 800, x: 0.9, y: 0.2, type: 'willow' }
+    ],
+    
+    finale: [
+        { delay: 0, x: 0.2, y: 0.4, type: 'chrysanthemum' },
+        { delay: 100, x: 0.4, y: 0.35, type: 'palm' },
+        { delay: 200, x: 0.6, y: 0.35, type: 'chrysanthemum' },
+        { delay: 300, x: 0.8, y: 0.4, type: 'palm' },
+        { delay: 500, x: 0.3, y: 0.25, type: 'star' },
+        { delay: 600, x: 0.5, y: 0.2, type: 'heart' },
+        { delay: 700, x: 0.7, y: 0.25, type: 'star' },
+        { delay: 1000, x: 0.5, y: 0.3, type: 'ring' }
+    ],
+    
+    symmetry: [
+        { delay: 0, x: 0.25, y: 0.3, type: 'star' },
+        { delay: 0, x: 0.75, y: 0.3, type: 'star' },
+        { delay: 500, x: 0.5, y: 0.2, type: 'heart' },
+        { delay: 1000, x: 0.25, y: 0.4, type: 'ring' },
+        { delay: 1000, x: 0.75, y: 0.4, type: 'ring' }
+    ],
+    
+    celebration: [
+        { delay: 0, x: 0.5, y: 0.3, type: 'heart' },
+        { delay: 400, x: 0.3, y: 0.25, type: 'star' },
+        { delay: 400, x: 0.7, y: 0.25, type: 'star' },
+        { delay: 800, x: 0.2, y: 0.35, type: 'chrysanthemum' },
+        { delay: 800, x: 0.8, y: 0.35, type: 'chrysanthemum' },
+        { delay: 1200, x: 0.5, y: 0.2, type: 'ring' }
+    ]
+};
+
+let currentShow = null;
+let showTimeouts = [];
+
+function playPresetShow(showName) {
+    // Stop any running show
+    stopPresetShow();
+    
+    const show = presetShows[showName];
+    if (!show) return;
+    
+    currentShow = showName;
+    
+    show.forEach(event => {
+        const timeout = setTimeout(() => {
+            const x = event.x * canvas.width;
+            const y = event.y * canvas.height;
+            
+            // Temporarily set explosion type
+            const originalType = selectedExplosionType;
+            selectedExplosionType = event.type;
+            launchFirework(x, y);
+            selectedExplosionType = originalType;
+        }, event.delay);
+        
+        showTimeouts.push(timeout);
+    });
+    
+    // Clear show after completion
+    const maxDelay = Math.max(...show.map(e => e.delay)) + 3000;
+    const clearTimeout = setTimeout(() => {
+        currentShow = null;
+        showTimeouts = [];
+    }, maxDelay);
+    showTimeouts.push(clearTimeout);
+}
+
+function stopPresetShow() {
+    showTimeouts.forEach(timeout => clearTimeout(timeout));
+    showTimeouts = [];
+    currentShow = null;
+}
+
 // Adjust for mobile
 if (config.isMobile) {
     config.particleCount = 60;
@@ -747,6 +971,8 @@ autoLaunchBtn.addEventListener('click', () => {
 // Settings panel controls
 const settingsToggle = document.getElementById('settingsToggle');
 const settingsPanel = document.getElementById('settingsPanel');
+const shareToggle = document.getElementById('shareToggle');
+const sharePanel = document.getElementById('sharePanel');
 const bgOptions = document.querySelectorAll('.bg-option');
 const explosionTypeSelect = document.getElementById('explosionType');
 
@@ -754,6 +980,12 @@ let selectedExplosionType = 'random';
 
 settingsToggle.addEventListener('click', () => {
     settingsPanel.classList.toggle('hidden');
+    sharePanel.classList.add('hidden');
+});
+
+shareToggle.addEventListener('click', () => {
+    sharePanel.classList.toggle('hidden');
+    settingsPanel.classList.add('hidden');
 });
 
 // Background selection
@@ -803,6 +1035,236 @@ createExplosion = function(x, y) {
     const type = selectedExplosionType === 'random' ? null : selectedExplosionType;
     originalCreateExplosion(x, y, type);
 };
+
+// Share panel controls
+const captureBtn = document.getElementById('captureBtn');
+const copyLinkBtn = document.getElementById('copyLinkBtn');
+const qrCodeBtn = document.getElementById('qrCodeBtn');
+const shareBtn = document.getElementById('shareBtn');
+const showButtons = document.querySelectorAll('.show-btn');
+const saveConfigBtn = document.getElementById('saveConfigBtn');
+const configNameInput = document.getElementById('configName');
+const savedConfigsList = document.getElementById('savedConfigsList');
+const shareMessage = document.getElementById('shareMessage');
+const qrCodeContainer = document.getElementById('qrCodeContainer');
+const qrCanvas = document.getElementById('qrCanvas');
+
+function showShareMessage(message, isSuccess = true) {
+    shareMessage.textContent = message;
+    shareMessage.className = `share-message ${isSuccess ? 'success' : 'error'}`;
+    shareMessage.classList.remove('hidden');
+    setTimeout(() => {
+        shareMessage.classList.add('hidden');
+    }, 3000);
+}
+
+// Screenshot capture
+captureBtn.addEventListener('click', () => {
+    if (captureScreenshot()) {
+        showShareMessage('Screenshot saved! 📸');
+    } else {
+        showShareMessage('Screenshot failed', false);
+    }
+});
+
+// Copy share link
+copyLinkBtn.addEventListener('click', async () => {
+    const url = generateShareURL();
+    try {
+        await navigator.clipboard.writeText(url);
+        showShareMessage('Link copied to clipboard! 🔗');
+    } catch (e) {
+        // Fallback for older browsers
+        const input = document.createElement('input');
+        input.value = url;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        showShareMessage('Link copied! 🔗');
+    }
+});
+
+// QR Code generation
+qrCodeBtn.addEventListener('click', () => {
+    const isHidden = qrCodeContainer.classList.contains('hidden');
+    
+    if (isHidden) {
+        const url = generateShareURL();
+        generateQRCode(url);
+        qrCodeContainer.classList.remove('hidden');
+        qrCodeBtn.textContent = '❌ Hide QR Code';
+    } else {
+        qrCodeContainer.classList.add('hidden');
+        qrCodeBtn.textContent = '📱 Show QR Code';
+    }
+});
+
+function generateQRCode(url) {
+    // Use QR Server API for simple QR code generation
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
+    
+    const ctx = qrCanvas.getContext('2d');
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    
+    img.onload = () => {
+        ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
+        ctx.drawImage(img, 0, 0, 200, 200);
+    };
+    
+    img.onerror = () => {
+        // Fallback: draw a simple pattern
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, 200, 200);
+        ctx.fillStyle = '#000000';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('QR Code', 100, 90);
+        ctx.fillText('Generation', 100, 110);
+        ctx.fillText('Failed', 100, 130);
+    };
+    
+    img.src = qrUrl;
+}
+
+// Share button
+shareBtn.addEventListener('click', async () => {
+    const url = generateShareURL();
+    
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Kaaro Fireworks',
+                text: 'Check out my custom fireworks display!',
+                url: url
+            });
+            showShareMessage('Shared successfully! 📱');
+        } catch (e) {
+            if (e.name !== 'AbortError') {
+                showShareMessage('Share cancelled', false);
+            }
+        }
+    } else {
+        // Fallback: copy link
+        await navigator.clipboard.writeText(url);
+        showShareMessage('Link copied! (Share not supported) 🔗');
+    }
+});
+
+// Preset shows
+showButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const showName = btn.dataset.show;
+        
+        // Remove playing class from all buttons
+        showButtons.forEach(b => b.classList.remove('playing'));
+        
+        if (currentShow === showName) {
+            stopPresetShow();
+        } else {
+            btn.classList.add('playing');
+            playPresetShow(showName);
+            showShareMessage(`Playing ${showName} show! 🎆`);
+            
+            // Remove playing class after show completes
+            setTimeout(() => {
+                btn.classList.remove('playing');
+            }, 3000);
+        }
+    });
+});
+
+// Save configuration
+saveConfigBtn.addEventListener('click', () => {
+    const name = configNameInput.value.trim();
+    if (!name) {
+        showShareMessage('Please enter a name', false);
+        return;
+    }
+    
+    saveConfiguration(name);
+    configNameInput.value = '';
+    updateSavedConfigsList();
+    showShareMessage(`Configuration "${name}" saved! 💾`);
+});
+
+// Update saved configs list
+function updateSavedConfigsList() {
+    const configs = getSavedConfigurations();
+    const configNames = Object.keys(configs).sort((a, b) => 
+        configs[b].timestamp - configs[a].timestamp
+    );
+    
+    if (configNames.length === 0) {
+        savedConfigsList.innerHTML = '<div style="color: rgba(255,255,255,0.4); font-size: 12px; text-align: center; padding: 8px;">No saved configurations</div>';
+        return;
+    }
+    
+    savedConfigsList.innerHTML = configNames.map(name => `
+        <div class="saved-config-item">
+            <span class="saved-config-name" data-name="${name}">${name}</span>
+            <span class="saved-config-delete" data-name="${name}">×</span>
+        </div>
+    `).join('');
+    
+    // Add click handlers
+    savedConfigsList.querySelectorAll('.saved-config-name').forEach(el => {
+        el.addEventListener('click', () => {
+            const name = el.dataset.name;
+            if (loadConfiguration(name)) {
+                showShareMessage(`Loaded "${name}"! ✅`);
+            }
+        });
+    });
+    
+    savedConfigsList.querySelectorAll('.saved-config-delete').forEach(el => {
+        el.addEventListener('click', () => {
+            const name = el.dataset.name;
+            deleteConfiguration(name);
+            updateSavedConfigsList();
+            showShareMessage(`Deleted "${name}"`, false);
+        });
+    });
+}
+
+// Update UI from config
+function updateUIFromConfig() {
+    // Update background buttons
+    bgOptions.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.bg === config.background);
+    });
+    
+    // Update explosion type
+    explosionTypeSelect.value = selectedExplosionType;
+    
+    // Update audio preset
+    document.getElementById('audioPreset').value = audioConfig.preset;
+    
+    // Update volume
+    volumeSlider.value = audioConfig.volume * 100;
+    volumeValue.textContent = Math.round(audioConfig.volume * 100) + '%';
+    
+    if (masterGain) {
+        masterGain.gain.value = audioConfig.volume;
+    }
+    
+    // Reinitialize background
+    if (config.background === 'starry') {
+        initStars();
+    } else if (config.background === 'city') {
+        initCity();
+    }
+}
+
+// Load config from URL on startup
+const urlConfig = getConfigFromURL();
+if (urlConfig) {
+    updateUIFromConfig();
+}
+
+// Initialize saved configs list
+updateSavedConfigsList();
 
 // Initialize backgrounds
 if (config.background === 'starry') {
