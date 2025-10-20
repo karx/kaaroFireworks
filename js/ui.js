@@ -105,8 +105,10 @@ function initSettingsControls() {
             styleButtons.forEach(b => b.classList.remove('active'));
             // Add active class to clicked button
             btn.classList.add('active');
-            // Update selected style
+            // Update selected style (both local and window)
             selectedFireworkStyle = btn.dataset.style;
+            window.selectedFireworkStyle = btn.dataset.style;
+            window.selectedExplosionType = btn.dataset.style; // Legacy support
             window.analytics?.trackExplosionTypeChange(selectedFireworkStyle);
         });
     });
@@ -509,7 +511,11 @@ function loadURLConfig() {
     const urlConfig = window.getConfigFromURL();
     if (urlConfig) {
         if (urlConfig.background) window.config.background = urlConfig.background;
-        if (urlConfig.explosionType) selectedFireworkStyle = urlConfig.explosionType;
+        if (urlConfig.explosionType) {
+            selectedFireworkStyle = urlConfig.explosionType;
+            window.selectedFireworkStyle = urlConfig.explosionType;
+            window.selectedExplosionType = urlConfig.explosionType; // Legacy support
+        }
         if (urlConfig.audioPreset && window.audioConfig) window.audioConfig.preset = urlConfig.audioPreset;
         if (urlConfig.volume !== undefined && window.audioConfig) window.audioConfig.volume = urlConfig.volume;
         updateUIFromConfig();

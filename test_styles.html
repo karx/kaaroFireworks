@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Firework Styles</title>
+</head>
+<body>
+    <h1>Testing Firework Style Selection</h1>
+    <div id="output"></div>
+    
+    <script src="js/config.js"></script>
+    <script>
+        const output = document.getElementById('output');
+        
+        // Test that fireworkStyles exists
+        output.innerHTML += '<h2>fireworkStyles object:</h2>';
+        output.innerHTML += '<pre>' + JSON.stringify(window.fireworkStyles, null, 2) + '</pre>';
+        
+        // Test that we can access each style
+        output.innerHTML += '<h2>Testing each style:</h2>';
+        Object.keys(window.fireworkStyles).forEach(key => {
+            const style = window.fireworkStyles[key];
+            output.innerHTML += `<p><strong>${key}</strong>: ${style.name} (${style.icon}) - Shape: ${style.shape}</p>`;
+        });
+        
+        // Test explosion shapes
+        output.innerHTML += '<h2>explosionShapes object:</h2>';
+        output.innerHTML += '<p>Available shapes: ' + Object.keys(window.explosionShapes).join(', ') + '</p>';
+    </script>
+</body>
+</html>

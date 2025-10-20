@@ -44,6 +44,7 @@ function animate() {
         if (exploded) {
             window.fireworks.splice(i, 1);
             const style = window.selectedFireworkStyle || 'random';
+            console.log('Firework exploded, using style:', style, 'window.selectedFireworkStyle:', window.selectedFireworkStyle);
             window.createExplosion(firework.x, firework.y, style);
         }
     }
