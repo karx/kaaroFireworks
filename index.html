@@ -47,6 +47,13 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-hz0gJn5upesI9m5qqO4-8.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+    
     <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
     
@@ -461,6 +468,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
     <!-- Load modules in dependency order -->
+    <script src="js/analytics.js"></script>
     <script src="js/config.js"></script>
     <script src="js/performance.js"></script>
     <script src="js/audio.js"></script>

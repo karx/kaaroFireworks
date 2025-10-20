@@ -226,6 +226,12 @@ function launchFirework(targetX, targetY) {
     const startX = Math.random() * window.canvas.width;
     const startY = window.canvas.height;
     fireworks.push(new Firework(startX, startY, targetX, targetY));
+    
+    // Track firework launch
+    window.analytics?.trackFireworkLaunch(
+        window.selectedExplosionType || 'random',
+        window.config?.isMobile || false
+    );
 }
 
 // Preset show management

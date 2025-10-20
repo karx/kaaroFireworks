@@ -94,6 +94,7 @@ async function createRoom(userName = 'Host') {
         setupPresence(roomId, userId);
         
         console.log('Room created:', roomId);
+        window.analytics?.trackRoomCreate();
         return { roomId, userId };
     } catch (error) {
         console.error('Error creating room:', error);
@@ -135,6 +136,7 @@ async function joinRoom(roomId, userName = 'Guest') {
         setupPresence(roomId, userId);
         
         console.log('Joined room:', roomId);
+        window.analytics?.trackRoomJoin(roomId);
         return { roomId, userId };
     } catch (error) {
         console.error('Error joining room:', error);
@@ -161,6 +163,7 @@ async function leaveRoom() {
         syncState.participants = {};
         
         console.log('Left room');
+        window.analytics?.trackRoomLeave();
     } catch (error) {
         console.error('Error leaving room:', error);
     }
@@ -184,6 +187,7 @@ function setupRoomListeners(roomId, userId) {
         
         // Launch firework based on event type
         handleRemoteEvent(event);
+        window.analytics?.trackSyncFireworkReceive();
     });
     
     syncState.eventListeners.push({ ref: eventsRef, listener: eventListener });
@@ -251,6 +255,7 @@ function broadcastFirework(x, y, type = 'firework', config = {}) {
     };
     
     database.ref(`rooms/${syncState.roomId}/events`).push(event);
+    window.analytics?.trackSyncFireworkSend();
 }
 
 // Handle remote firework event

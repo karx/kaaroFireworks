@@ -45,8 +45,10 @@ function initPanelControls() {
     settingsToggle?.addEventListener('click', () => {
         if (settingsPanel.classList.contains('hidden')) {
             openPanel(settingsPanel);
+            window.analytics?.trackMenuOpen('settings');
         } else {
             closePanels();
+            window.analytics?.trackMenuClose('settings');
         }
     });
     
@@ -58,8 +60,10 @@ function initPanelControls() {
     shareToggle?.addEventListener('click', () => {
         if (sharePanel.classList.contains('hidden')) {
             openPanel(sharePanel);
+            window.analytics?.trackMenuOpen('share');
         } else {
             closePanels();
+            window.analytics?.trackMenuClose('share');
         }
     });
     
@@ -88,6 +92,8 @@ function initSettingsControls() {
             } else if (window.config.background === 'city') {
                 window.initCity();
             }
+            
+            window.analytics?.trackBackgroundChange(window.config.background);
         });
     });
     
@@ -95,6 +101,7 @@ function initSettingsControls() {
     const explosionTypeSelect = document.getElementById('explosionType');
     explosionTypeSelect?.addEventListener('change', (e) => {
         selectedExplosionType = e.target.value;
+        window.analytics?.trackExplosionTypeChange(selectedExplosionType);
     });
     
     // Volume control
@@ -111,10 +118,15 @@ function initSettingsControls() {
         }
     });
     
+    volumeSlider?.addEventListener('change', (e) => {
+        window.analytics?.trackVolumeChange(parseInt(e.target.value));
+    });
+    
     // Audio preset selection
     const audioPresetSelect = document.getElementById('audioPreset');
     audioPresetSelect?.addEventListener('change', (e) => {
         window.audioConfig.preset = e.target.value;
+        window.analytics?.trackAudioPresetChange(e.target.value);
     });
     
     // Text explosions
@@ -147,6 +159,9 @@ function initSettingsControls() {
                     fontSize: fontSize
                 });
             }
+            
+            // Track text explosion
+            window.analytics?.trackTextExplosion(text.length);
             
             // Broadcast to room if connected
             if (window.syncState?.isConnected && window.broadcastFirework) {
@@ -201,6 +216,9 @@ function initSettingsControls() {
                     maxWidth: maxWidth,
                     useImageColors: useImageColors?.checked !== false
                 });
+                
+                // Track image explosion
+                window.analytics?.trackImageExplosion(file.type);
             });
         }
     });
@@ -228,6 +246,7 @@ function initShareControls() {
     captureBtn?.addEventListener('click', () => {
         if (window.captureScreenshot()) {
             showShareMessage('Screenshot saved!');
+            window.analytics?.trackScreenshotCapture();
         } else {
             showShareMessage('Screenshot failed', false);
         }
@@ -238,6 +257,8 @@ function initShareControls() {
         try {
             await navigator.clipboard.writeText(url);
             showShareMessage('Link copied to clipboard!');
+            window.analytics?.trackShareURLGenerate();
+            window.analytics?.trackShareURLCopy();
         } catch (e) {
             showShareMessage('Failed to copy link', false);
         }
@@ -262,6 +283,7 @@ function initShareControls() {
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.H
                 });
+                window.analytics?.trackQRCodeGenerate();
             } catch (error) {
                 console.error('QR code error:', error);
                 showShareMessage('QR code generation failed', false);
@@ -281,10 +303,12 @@ function initShareControls() {
             if (window.currentShow === showName) {
                 window.stopPresetShow();
                 btn.classList.remove('playing');
+                window.analytics?.trackAutoShowStop();
             } else {
                 showButtons.forEach(b => b.classList.remove('playing'));
                 window.playPresetShow(showName);
                 btn.classList.add('playing');
+                window.analytics?.trackAutoShowStart();
             }
         });
     });
@@ -296,6 +320,7 @@ function initShareControls() {
             showShareMessage(`Configuration "${name}" saved!`);
             configNameInput.value = '';
             updateSavedConfigsList();
+            window.analytics?.trackConfigSave(name);
         }
     });
     
@@ -348,10 +373,18 @@ function initPerformanceControls() {
     
     batterySavingCheckbox?.addEventListener('change', (e) => {
         window.performanceConfig.batterySaving = e.target.checked;
+        window.analytics?.trackPerformanceMode(
+            window.performanceConfig.batterySaving,
+            window.performanceConfig.reducedMotion
+        );
     });
     
     reducedMotionCheckbox?.addEventListener('change', (e) => {
         window.performanceConfig.reducedMotion = e.target.checked;
+        window.analytics?.trackPerformanceMode(
+            window.performanceConfig.batterySaving,
+            window.performanceConfig.reducedMotion
+        );
     });
     
     showProfilerCheckbox?.addEventListener('change', (e) => {

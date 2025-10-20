@@ -90,6 +90,11 @@ function updateFPS() {
         if (performanceConfig.adaptiveQuality && window.config) {
             if (avgFPS < 30 && window.config.particleCount > 20) {
                 window.config.particleCount = Math.max(20, window.config.particleCount - 5);
+                // Track FPS drop (throttled to once per minute)
+                if (!performanceConfig.lastFPSTrack || Date.now() - performanceConfig.lastFPSTrack > 60000) {
+                    window.analytics?.trackFPSDrop(avgFPS);
+                    performanceConfig.lastFPSTrack = Date.now();
+                }
             } else if (avgFPS > 55 && window.config.particleCount < 100) {
                 window.config.particleCount = Math.min(100, window.config.particleCount + 2);
             }

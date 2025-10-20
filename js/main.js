@@ -97,6 +97,18 @@ function init() {
     // Start animation
     animate();
     
+    // Track first interaction
+    let firstInteraction = false;
+    const trackFirstInteraction = () => {
+        if (!firstInteraction) {
+            firstInteraction = true;
+            window.analytics?.trackFirstInteraction();
+        }
+    };
+    
+    window.canvas.addEventListener('click', trackFirstInteraction, { once: true });
+    window.canvas.addEventListener('touchstart', trackFirstInteraction, { once: true });
+    
     // Launch initial firework after a short delay
     setTimeout(() => {
         const x = window.canvas.width / 2;
