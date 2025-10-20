@@ -6,10 +6,16 @@ An interactive, high-performance fireworks simulation built with vanilla JavaScr
 
 - **Realistic Physics**: Particle system with gravity, friction, and parabolic trajectories
 - **Visual Effects**: Additive blending for authentic glow and motion blur trails
-- **Audio Synthesis**: Web Audio API for synchronized launch and explosion sounds
+- **Dual Audio System**: 
+  - Real firework sound samples (OGG format)
+  - Web Audio API synthesis with spatial effects
+  - 6 audio presets: Realistic, Epic, Minimal, Cartoonish, Balanced, Synthesized
+- **Spatial Audio**: Stereo panning, distance-based volume, and configurable reverb
 - **Interactive**: Click anywhere to launch fireworks or use auto-launch mode
+- **Multi-User Sync**: Real-time firework synchronization across devices via Firebase
+- **Custom Content**: Text explosions, image explosions, and custom shapes
 - **Responsive**: Full-screen canvas that adapts to any screen size
-- **Lightweight**: No external dependencies, pure vanilla JavaScript
+- **Lightweight**: Minimal dependencies, optimized performance
 
 ## Quick Start
 
@@ -48,9 +54,69 @@ netlify deploy --prod
 
 ## Usage
 
+### Basic Controls
 - **Click/Tap**: Launch a firework at the clicked location
 - **Auto Launch Button**: Toggle continuous automatic firework launches
 - **Mobile**: Full touch support for mobile devices
+
+### Audio Presets
+Choose from 6 different audio experiences:
+
+**Sample-Based** (Real Recordings):
+- 🎵 **Realistic** - Natural firework sounds with moderate reverb
+- 🎆 **Epic** - Louder explosions with heavy reverb for dramatic effect
+- 🔇 **Minimal** - Subtle, quiet sounds with light reverb
+- 🎪 **Cartoonish** - Faster playback for a playful feel
+- ⚖️ **Balanced** - Perfect middle ground
+
+**Synthesis-Based** (Generated):
+- 🎹 **Synthesized** - Original Web Audio synthesis with crackling effects
+
+All presets include spatial audio (stereo panning, distance-based volume, reverb).
+
+### Settings
+- **Volume**: Master volume control (0-100%)
+- **Reverb**: Adjust echo/ambience (0-100%)
+- **Background**: Choose starry sky, city skyline, or black
+- **Explosion Types**: Standard, willow, chrysanthemum, palm, star, heart, ring
+
+### Advanced Features
+- **Text Explosions**: Type text to create custom firework messages
+- **Image Explosions**: Upload images to explode as fireworks
+- **Multi-User Sync**: Create/join rooms to sync fireworks across devices
+- **Auto Shows**: Pre-programmed firework sequences
+- **Configuration Sharing**: Save and share your settings via URL/QR code
+
+## Audio System
+
+### Dual Audio Architecture
+The application features a hybrid audio system combining real sound samples with Web Audio synthesis:
+
+**Sample-Based Audio**:
+- 3 high-quality OGG firework explosion samples
+- Random sample selection for variety
+- Playback rate variation (±10%) for realism
+- Professional recorded sound quality
+
+**Synthesis-Based Audio**:
+- Real-time Web Audio API synthesis
+- White noise filtering for explosion sounds
+- Crackling/sparkle effects (high-frequency oscillators)
+- Dynamic sound generation
+
+**Spatial Audio Effects** (Both modes):
+- Stereo panning based on screen position
+- Distance-based volume attenuation
+- Configurable reverb (0-100%)
+- Immersive 3D-like audio experience
+
+### Audio Files
+Located in `sounds/explosion/`:
+- `firework 1.ogg` (25KB)
+- `firework 2.ogg` (25KB)
+- `firework 3.ogg` (34KB)
+
+All samples are OGG Vorbis format for optimal web compression.
 
 ## Technical Details
 

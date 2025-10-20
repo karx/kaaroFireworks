@@ -1,12 +1,24 @@
 # Firework Sound Samples
 
+## Current Samples
+
+We currently have **3 explosion sound samples**:
+- `firework 1.ogg` (25KB) - Standard burst
+- `firework 2.ogg` (25KB) - Alternate explosion
+- `firework 3.ogg` (34KB) - Variation
+
+These samples are used by all sample-based audio presets (Realistic, Epic, Minimal, Cartoonish, Balanced).
+
 ## Directory Structure
 
 ```
 sounds/
-├── launch/          # Launch/whoosh sounds (3-5 files)
-├── explosion/       # Explosion/burst sounds (5-8 files)
-└── ambient/         # Optional ambient sounds
+├── launch/          # Launch/whoosh sounds (empty - future)
+├── explosion/       # Explosion/burst sounds (3 files)
+│   ├── firework 1.ogg
+│   ├── firework 2.ogg
+│   └── firework 3.ogg
+└── ambient/         # Optional ambient sounds (empty - future)
 ```
 
 ## Sample Requirements

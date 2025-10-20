@@ -1,52 +1,63 @@
-# Audio Enhancement Features - v1.3
+# Audio Enhancement Features - v2.0
 
-## Implemented Features ✅
+## Current Audio System ✅
 
-### 1. Volume Control
-- **Volume Slider**: 0-100% range with real-time adjustment
-- **Master Gain Node**: All audio routes through master volume control
-- **Visual Feedback**: Displays current volume percentage
-- **Smooth Transitions**: No audio pops when adjusting volume
+### Dual Audio Architecture
+The application now features a **hybrid audio system** with two modes:
 
-### 2. Multiple Explosion Sound Variations
-- **Variation Count**: 1-5 variations per preset
-- **Frequency Modulation**: Each variation has different filter sweep
-- **Random Selection**: Automatically picks variation on each explosion
-- **Preset-Based**: Number of variations depends on audio preset
+#### Sample-Based Audio (Default)
+- **Real Recordings**: 3 high-quality OGG firework samples
+- **Random Selection**: Picks different sample each time
+- **Playback Variation**: ±10% pitch variation for realism
+- **Professional Quality**: Authentic firework sounds
 
-**Variations:**
-- Realistic: 3 variations
-- Cartoonish: 5 variations  
-- Minimal: 1 variation
+**Available Samples:**
+- `firework 1.ogg` (25KB) - Standard burst
+- `firework 2.ogg` (25KB) - Alternate explosion  
+- `firework 3.ogg` (34KB) - Variation
 
-### 3. Crackling/Popping Particle Sounds
-- **Dynamic Count**: 3-8 crackles per explosion based on intensity
-- **Random Timing**: Crackles spread over 200ms after explosion
-- **High-Frequency Pops**: 3000-5000 Hz square wave bursts
-- **Position Variation**: Each crackle slightly offset from explosion center
-- **Intensity Control**: Adjustable per preset (0-0.6)
+#### Synthesis-Based Audio
+- **Web Audio API**: Real-time sound generation
+- **White Noise**: Filtered for explosion sounds
+- **Crackling Effects**: High-frequency oscillators (3000-5000 Hz)
+- **Dynamic Generation**: No pre-recorded files needed
 
-**Preset Intensities:**
-- Realistic: 0.3
-- Cartoonish: 0.6
-- Minimal: 0 (disabled)
+### Audio Presets
 
-### 4. Stereo Panning Based on Position
+**Sample-Based Presets:**
+1. 🎵 **Realistic** - Natural sound, moderate reverb (40%)
+2. 🎆 **Epic** - Louder (+20%), heavy reverb (70%)
+3. 🔇 **Minimal** - Quieter (-30%), light reverb (15%)
+4. 🎪 **Cartoonish** - Faster playback (+15%), light reverb (20%)
+5. ⚖️ **Balanced** - Middle ground, moderate reverb (30%)
+
+**Synthesis-Based Preset:**
+6. 🎹 **Synthesized** - Original Web Audio synthesis with crackling
+
+### Spatial Audio Effects (All Presets)
+
+#### 1. Stereo Panning
 - **Full Stereo Field**: -1 (left) to +1 (right)
-- **Position Mapping**: X position normalized to stereo field
-- **Applied to All Sounds**: Launch, explosion, and crackling
-- **Smooth Panning**: No audio artifacts during movement
+- **Position-Based**: X position mapped to stereo field
+- **Applied to All Sounds**: Explosions and effects
+- **Smooth Panning**: No audio artifacts
 
-### 5. Echo/Reverb Effects
-- **Convolver-Based Reverb**: 2-second impulse response
-- **Stereo Reverb**: Independent left/right channels
-- **Decay Curve**: Exponential decay for natural sound
-- **Wet/Dry Mix**: Adjustable per preset
+#### 2. Distance-Based Volume
+- **Attenuation**: Volume decreases with distance from center
+- **Configurable Falloff**: Different per preset
+- **Natural Feel**: Mimics real-world sound propagation
 
-**Reverb Amounts:**
-- Realistic: 40% wet
-- Cartoonish: 20% wet
-- Minimal: 10% wet
+#### 3. Reverb/Echo
+- **Convolver-Based**: 2-second impulse response
+- **Stereo Reverb**: Independent L/R channels
+- **User Controllable**: 0-100% wet/dry mix slider
+- **Preset Defaults**: Each preset has optimal reverb amount
+
+#### 4. Volume Control
+- **Master Volume**: 0-100% slider
+- **Real-Time Adjustment**: Instant feedback
+- **Visual Display**: Shows current percentage
+- **Smooth Transitions**: No audio pops
 
 ### 6. Distance-Based Volume
 - **Center Reference**: Volume calculated from screen center
