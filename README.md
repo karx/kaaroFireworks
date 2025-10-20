@@ -4,8 +4,14 @@ An interactive, high-performance fireworks simulation built with vanilla JavaScr
 
 ## Features
 
+- **11 Unique Firework Styles**: Sphere, Star, Heart, Ring, Willow, Chrysanthemum, Palm, Spiral, Crossette, Peony, Double Ring
+- **Visual Grid Selector**: Intuitive 4-column grid with icons for easy style selection
 - **Realistic Physics**: Particle system with gravity, friction, and parabolic trajectories
 - **Visual Effects**: Additive blending for authentic glow and motion blur trails
+- **Style-Specific Audio**: Each firework style has unique sound characteristics
+  - Volume, brightness, decay, and reverb tailored per style
+  - Layered sounds for complex effects (multi-burst)
+  - Filter sweeps and special effects (whooshing, cascading)
 - **Dual Audio System**: 
   - Real firework sound samples (OGG format)
   - Web Audio API synthesis with spatial effects
@@ -15,6 +21,8 @@ An interactive, high-performance fireworks simulation built with vanilla JavaScr
 - **Multi-User Sync**: Real-time firework synchronization across devices via Firebase
 - **Custom Content**: Text explosions, image explosions, and custom shapes
 - **Responsive**: Full-screen canvas that adapts to any screen size
+- **Performance Optimized**: Adaptive quality, battery saving mode, particle pooling
+- **Analytics**: Privacy-friendly Plausible Analytics integration
 - **Lightweight**: Minimal dependencies, optimized performance
 
 ## Quick Start
@@ -75,10 +83,21 @@ Choose from 6 different audio experiences:
 All presets include spatial audio (stereo panning, distance-based volume, reverb).
 
 ### Settings
+- **Firework Style**: Visual grid selector with 11 unique styles + Random
+  - 💥 Sphere - Classic burst
+  - ⭐ Star - 5-pointed star
+  - ❤️ Heart - Romantic heart
+  - ⭕ Ring - Perfect circle
+  - 🌿 Willow - Drooping trails
+  - 🌸 Chrysanthemum - Multi-burst
+  - 🌴 Palm - Palm tree effect
+  - 🌀 Spiral - Rotating burst
+  - ✨ Crossette - Split bursts
+  - 🌺 Peony - Dense center
+  - ⭕⭕ Double Ring - Concentric circles
 - **Volume**: Master volume control (0-100%)
 - **Reverb**: Adjust echo/ambience (0-100%)
 - **Background**: Choose starry sky, city skyline, or black
-- **Explosion Types**: Standard, willow, chrysanthemum, palm, star, heart, ring
 
 ### Advanced Features
 - **Text Explosions**: Type text to create custom firework messages
@@ -93,9 +112,11 @@ All presets include spatial audio (stereo panning, distance-based volume, reverb
 The application features a hybrid audio system combining real sound samples with Web Audio synthesis:
 
 **Sample-Based Audio**:
-- 3 high-quality OGG firework explosion samples
+- 2 high-quality OGG firework explosion samples
+- 1 launch/whoosh sound sample
 - Random sample selection for variety
-- Playback rate variation (±10%) for realism
+- Style-specific audio characteristics (11 unique profiles)
+- Layered sounds for complex effects (multi-burst)
 - Professional recorded sound quality
 
 **Synthesis-Based Audio**:
@@ -104,19 +125,76 @@ The application features a hybrid audio system combining real sound samples with
 - Crackling/sparkle effects (high-frequency oscillators)
 - Dynamic sound generation
 
+**Style-Specific Audio Processing**:
+- Volume multipliers: 0.85x - 1.2x per style
+- Filter frequencies: 9kHz - 15kHz (brightness control)
+- Decay times: 0.8x - 1.5x (envelope shaping)
+- Reverb multipliers: 0.8x - 1.4x per style
+- Pitch variations: 0.1 - 0.4 (playback rate randomization)
+- Special effects: Filter sweeps (Spiral), multi-burst (Chrysanthemum, Crossette, Double Ring)
+
 **Spatial Audio Effects** (Both modes):
 - Stereo panning based on screen position
 - Distance-based volume attenuation
 - Configurable reverb (0-100%)
 - Immersive 3D-like audio experience
 
-### Audio Files
-Located in `sounds/explosion/`:
-- `firework 1.ogg` (25KB)
-- `firework 2.ogg` (25KB)
-- `firework 3.ogg` (34KB)
+**Variation System**:
+Each explosion has 7 types of randomization for natural variety:
+1. Pitch variation (style-specific)
+2. Volume variation (±15%)
+3. Reverb variation (±20%)
+4. Filter variation (±10%)
+5. Timing variation (0-30ms delay)
+6. Pan variation (±0.1 stereo)
+7. Sample selection (random)
 
-All samples are OGG Vorbis format for optimal web compression.
+### Audio Files
+**Explosion Sounds** (`sounds/explosion/`):
+- `firework 1.ogg` (25KB) - Standard burst
+- `firework 2.ogg` (25KB) - Alternate explosion
+
+**Launch Sounds** (`sounds/launch/`):
+- `launch_1.ogg` (34KB) - Whoosh/trail sound
+
+All samples are OGG Vorbis format for optimal web compression and quality.
+
+### Style-Specific Audio Characteristics
+
+Each of the 11 firework styles has unique audio characteristics that match its visual effect:
+
+| Style | Volume | Brightness | Decay | Reverb | Special Effect |
+|-------|--------|------------|-------|--------|----------------|
+| **Sphere** 💥 | Medium | Medium | Medium | Medium | Balanced baseline |
+| **Star** ⭐ | High | Very High | Quick | Low | Sharp & crisp |
+| **Heart** ❤️ | Low | Low | Long | High | Soft & romantic |
+| **Ring** ⭕ | High | High | Medium | High | Clear & resonant |
+| **Willow** 🌿 | Low | Very Low | Very Long | Very High | Soft & drooping |
+| **Chrysanthemum** 🌸 | Very High | Highest | Quick | Medium | 3 layered bursts |
+| **Palm** 🌴 | Medium | Low | Long | Very High | Cascading effect |
+| **Spiral** 🌀 | High | High | Medium | Medium | Filter sweep (whoosh) |
+| **Crossette** ✨ | High | Very High | Quick | Low | 2 split bursts |
+| **Peony** 🌺 | Highest | Medium | Long | Medium | Dense boom |
+| **Double Ring** ⭕⭕ | Very High | High | Medium | High | 2 quick bursts |
+
+**Audio Parameters**:
+- **Volume**: 0.85x - 1.2x multiplier
+- **Brightness**: 9kHz - 15kHz lowpass filter frequency
+- **Decay**: 0.8x - 1.5x envelope decay time
+- **Reverb**: 0.8x - 1.4x reverb amount multiplier
+- **Layered Sounds**: Multi-burst effects for complex styles (Chrysanthemum, Crossette, Double Ring)
+- **Special Effects**: Filter sweeps, pitch variations, spatial positioning
+
+**Variation System**: Each sound has 7 types of randomization:
+1. Pitch: ±(style-specific)% playback rate
+2. Volume: ±15% random variation
+3. Reverb: ±20% random variation
+4. Filter: ±10% frequency variation
+5. Timing: 0-30ms random delay
+6. Pan: ±0.1 stereo based on position
+7. Sample: Random selection from available samples
+
+**Result**: With 2 OGG samples × 11 styles × 7 variations = thousands of unique, natural-sounding explosions.
 
 ## Technical Details
 
