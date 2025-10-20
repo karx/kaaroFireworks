@@ -46,6 +46,105 @@ body {
     z-index: 10;
 }
 
+/* Collapsible sections */
+.collapsible-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.collapsible-header:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.collapsible-header.active {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.collapse-icon {
+    transition: transform 0.3s ease;
+    font-size: 12px;
+}
+
+.collapsible-header.active .collapse-icon {
+    transform: rotate(180deg);
+}
+
+.collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.collapsible-content:not(.hidden) {
+    max-height: 1000px;
+    padding: 16px;
+}
+
+/* Audio sections */
+.audio-section {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.audio-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.audio-section h4 {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.setting-group-small {
+    margin-bottom: 12px;
+}
+
+.setting-group-small:last-child {
+    margin-bottom: 0;
+}
+
+.setting-group-small label {
+    display: block;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.setting-group-small input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.full-width {
+    width: 100%;
+}
+
 button {
     padding: 12px 20px;
     font-size: 13px;
