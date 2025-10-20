@@ -126,27 +126,10 @@ class Firework {
     }
     
     playLaunchSound() {
-        if (!window.audioContext) return;
-        
-        const preset = window.audioPresets[window.audioConfig.preset];
-        const oscillator = window.audioContext.createOscillator();
-        const gainNode = window.audioContext.createGain();
-        const panner = window.createPanner(this.x);
-        const distanceVolume = window.getDistanceVolume(this.x, this.y);
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(panner);
-        panner.connect(window.masterGain);
-        
-        oscillator.frequency.setValueAtTime(preset.launchFreqStart, window.audioContext.currentTime);
-        oscillator.frequency.linearRampToValueAtTime(preset.launchFreqEnd, window.audioContext.currentTime + preset.launchDuration);
-        
-        const baseVolume = 0.1 * distanceVolume;
-        gainNode.gain.setValueAtTime(baseVolume, window.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, window.audioContext.currentTime + preset.launchDuration);
-        
-        oscillator.start(window.audioContext.currentTime);
-        oscillator.stop(window.audioContext.currentTime + preset.launchDuration);
+        // Use the new sample-based launch sound system
+        if (window.playLaunchSound) {
+            window.playLaunchSound(this.x, this.y);
+        }
     }
     
     update() {

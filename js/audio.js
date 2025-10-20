@@ -71,12 +71,11 @@ const audioPresets = {
 // Sample file paths
 const samplePaths = {
     launch: [
-        // No launch sounds yet - will use synthesis fallback
+        'sounds/launch/launch_1.ogg'
     ],
     explosion: [
         'sounds/explosion/firework 1.ogg',
-        'sounds/explosion/firework 2.ogg',
-        'sounds/explosion/firework 3.ogg'
+        'sounds/explosion/firework 2.ogg'
     ]
 };
 
@@ -361,7 +360,7 @@ function playLaunchSound(x, y) {
     const source = audioContext.createBufferSource();
     source.buffer = buffer;
     
-    // Playback rate variation
+    // Playback rate variation (pitch)
     const rateVariation = preset.playbackRateVariation;
     source.playbackRate.value = 1.0 + (Math.random() - 0.5) * rateVariation * 2;
     
@@ -369,17 +368,31 @@ function playLaunchSound(x, y) {
     const gainNode = audioContext.createGain();
     const panner = createPanner(x);
     
-    // Simple routing (no reverb for launch)
-    source.connect(gainNode);
+    // Add subtle filter for tonal variation
+    const filter = audioContext.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = 100 + Math.random() * 200; // 100-300 Hz
+    filter.Q.value = 0.5;
+    
+    // Audio routing with filter (no reverb for launch - keeps it crisp)
+    source.connect(filter);
+    filter.connect(gainNode);
     gainNode.connect(panner);
     panner.connect(masterGain);
     
-    // Apply settings
+    // Apply settings with variations
     const distanceVolume = getDistanceVolume(x, y);
-    gainNode.gain.value = distanceVolume * preset.volumeMultiplier * 0.5; // Quieter than explosions
+    
+    // Add random volume variation (±10%) for launch sounds
+    const volumeVariation = 0.9 + Math.random() * 0.2; // 0.9 to 1.1
+    gainNode.gain.value = distanceVolume * preset.volumeMultiplier * 0.6 * volumeVariation;
+    
+    // Add slight random delay (0-20ms)
+    const randomDelay = Math.random() * 0.02;
+    const startTime = audioContext.currentTime + randomDelay;
     
     // Play
-    source.start(audioContext.currentTime);
+    source.start(startTime);
 }
 
 // Export to global scope
