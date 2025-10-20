@@ -115,6 +115,7 @@
     
     <div class="controls">
         <button id="autoLaunch" class="btn-primary">Auto Launch</button>
+        <button id="showEditorToggle" class="btn-primary">🎬 Show Editor</button>
         <button id="settingsToggle" class="btn-secondary">⚙️</button>
         <button id="shareToggle" class="btn-secondary">📤</button>
         <a href="about.html" class="btn-secondary about-link" title="About">ℹ️</a>
@@ -161,6 +162,34 @@
                 <option value="cartoonish">🎪 Cartoonish</option>
                 <option value="minimal">🔇 Minimal</option>
             </select>
+        </div>
+        
+        <div class="setting-group">
+            <label>Text Explosions</label>
+            <div class="save-config-group">
+                <input type="text" id="textInput" placeholder="Enter text..." maxlength="20">
+                <button class="action-btn-small" id="launchTextBtn">🔤 Launch</button>
+            </div>
+            <div style="margin-top: 8px;">
+                <input type="range" id="textSize" min="50" max="200" value="100" class="slider">
+                <label style="font-size: 11px; color: rgba(255,255,255,0.6);">Size: <span id="textSizeValue">100</span>px</label>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <label>Image/Logo Explosions</label>
+            <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+            <button class="action-btn" id="uploadImageBtn">📁 Upload Image</button>
+            <div style="margin-top: 8px;">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="useImageColors" checked>
+                    <span>Use Image Colors</span>
+                </label>
+            </div>
+            <div style="margin-top: 8px;">
+                <input type="range" id="imageSize" min="100" max="500" value="300" class="slider">
+                <label style="font-size: 11px; color: rgba(255,255,255,0.6);">Size: <span id="imageSizeValue">300</span>px</label>
+            </div>
         </div>
         
         <div class="setting-group">
@@ -232,6 +261,174 @@
         <div id="shareMessage" class="share-message hidden"></div>
     </div>
     
-    <script src="app.js"></script>
+    <!-- Show Editor Panel -->
+    <div id="showEditorPanel" class="show-editor-panel hidden">
+        <div class="panel-header">
+            <h3>🎬 Show Editor</h3>
+            <button class="panel-close" id="showEditorClose">✕</button>
+        </div>
+        
+        <div class="show-info">
+            <input type="text" id="showName" placeholder="Show Name" value="Untitled Show" class="show-name-input">
+            <div class="show-duration">
+                <span>Duration: </span>
+                <span id="showDuration">0:00</span>
+            </div>
+        </div>
+        
+        <div class="playback-controls">
+            <button id="playShow" class="btn-icon" title="Play">▶</button>
+            <button id="pauseShow" class="btn-icon" title="Pause" disabled>⏸</button>
+            <button id="stopShow" class="btn-icon" title="Stop">⏹</button>
+            <button id="resetShow" class="btn-icon" title="Reset">⏮</button>
+            <div class="playback-time">
+                <span id="currentTime">0:00</span>
+                <span> / </span>
+                <span id="totalTime">0:00</span>
+            </div>
+        </div>
+        
+        <div class="timeline-container">
+            <div class="timeline-header">
+                <span>Timeline</span>
+                <div class="timeline-zoom">
+                    <button id="zoomOut" class="btn-icon-sm">−</button>
+                    <span id="zoomLevel">1x</span>
+                    <button id="zoomIn" class="btn-icon-sm">+</button>
+                </div>
+            </div>
+            <div class="timeline-canvas-wrapper">
+                <canvas id="timelineCanvas" width="600" height="100"></canvas>
+                <div id="timelinePlayhead" class="timeline-playhead"></div>
+            </div>
+            <div class="timeline-ruler" id="timelineRuler"></div>
+        </div>
+        
+        <div class="event-controls">
+            <button id="addEvent" class="btn-secondary">+ Add Event</button>
+            <button id="addBurst" class="btn-secondary">💥 Add Burst</button>
+            <button id="addFinale" class="btn-secondary">🎆 Add Finale</button>
+            <button id="deleteEvent" class="btn-secondary" disabled>🗑 Delete</button>
+        </div>
+        
+        <div class="event-properties" id="eventProperties">
+            <h4>Event Properties</h4>
+            <div class="property-group">
+                <label>Time (seconds)</label>
+                <input type="number" id="eventTime" min="0" step="0.1" disabled>
+            </div>
+            <div class="property-group">
+                <label>Type</label>
+                <select id="eventType" disabled>
+                    <option value="firework">Single Firework</option>
+                    <option value="burst">Burst</option>
+                    <option value="finale">Finale</option>
+                </select>
+            </div>
+            <div id="fireworkProperties" class="type-properties">
+                <div class="property-group">
+                    <label>Position X (0-1)</label>
+                    <input type="number" id="eventX" min="0" max="1" step="0.01" value="0.5" disabled>
+                </div>
+                <div class="property-group">
+                    <label>Position Y (0-1)</label>
+                    <input type="number" id="eventY" min="0" max="1" step="0.01" value="0.8" disabled>
+                </div>
+                <div class="property-group">
+                    <label>Explosion Type</label>
+                    <select id="eventExplosion" disabled>
+                        <option value="random">Random</option>
+                        <option value="standard">Standard</option>
+                        <option value="willow">Willow</option>
+                        <option value="chrysanthemum">Chrysanthemum</option>
+                        <option value="palm">Palm</option>
+                        <option value="star">Star</option>
+                        <option value="heart">Heart</option>
+                        <option value="ring">Ring</option>
+                    </select>
+                </div>
+            </div>
+            <div id="burstProperties" class="type-properties hidden">
+                <div class="property-group">
+                    <label>Count</label>
+                    <input type="number" id="burstCount" min="1" max="20" value="5" disabled>
+                </div>
+                <div class="property-group">
+                    <label>Spread (0-1)</label>
+                    <input type="number" id="burstSpread" min="0" max="1" step="0.1" value="0.3" disabled>
+                </div>
+            </div>
+            <div id="finaleProperties" class="type-properties hidden">
+                <div class="property-group">
+                    <label>Duration (seconds)</label>
+                    <input type="number" id="finaleDuration" min="1" max="30" value="5" disabled>
+                </div>
+                <div class="property-group">
+                    <label>Intensity</label>
+                    <select id="finaleIntensity" disabled>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="extreme">Extreme</option>
+                    </select>
+                </div>
+                <div class="property-group">
+                    <label>Pattern</label>
+                    <select id="finalePattern" disabled>
+                        <option value="random">Random</option>
+                        <option value="cascade">Cascade</option>
+                        <option value="symmetrical">Symmetrical</option>
+                        <option value="spiral">Spiral</option>
+                    </select>
+                </div>
+            </div>
+            <button id="applyEventChanges" class="btn-primary" disabled>Apply Changes</button>
+        </div>
+        
+        <div class="show-actions">
+            <button id="saveShow" class="btn-primary">💾 Save Show</button>
+            <button id="loadShow" class="btn-secondary">📁 Load Show</button>
+            <button id="exportShow" class="btn-secondary">📤 Export JSON</button>
+            <button id="importShow" class="btn-secondary">📥 Import JSON</button>
+            <button id="showGallery" class="btn-secondary">🖼️ Gallery</button>
+        </div>
+        
+        <div class="show-settings">
+            <h4>Show Settings</h4>
+            <div class="property-group">
+                <label>
+                    <input type="checkbox" id="showLoop">
+                    Loop Show
+                </label>
+            </div>
+            <div class="property-group" id="loopCountGroup" style="display: none;">
+                <label>Loop Count</label>
+                <input type="number" id="loopCount" min="1" max="100" value="1">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Show Gallery Modal -->
+    <div id="showGalleryModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Show Gallery</h3>
+                <button class="modal-close" id="galleryClose">✕</button>
+            </div>
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Gallery items will be populated here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Load modules in dependency order -->
+    <script src="js/config.js"></script>
+    <script src="js/performance.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/fireworks.js"></script>
+    <script src="js/show-editor.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
