@@ -141,6 +141,62 @@ select option {
     color: white;
 }
 
+.slider {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(100, 100, 255, 0.8);
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+    background: rgba(100, 100, 255, 1);
+    transform: scale(1.1);
+}
+
+.slider::-webkit-slider-thumb:active {
+    transform: scale(0.95);
+}
+
+.slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(100, 100, 255, 0.8);
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.2s ease;
+}
+
+.slider::-moz-range-thumb:hover {
+    background: rgba(100, 100, 255, 1);
+    transform: scale(1.1);
+}
+
+.slider::-moz-range-thumb:active {
+    transform: scale(0.95);
+}
+
+.setting-group label span {
+    float: right;
+    color: rgba(100, 100, 255, 0.8);
+    font-weight: 600;
+}
+
 .info {
     color: rgba(255, 255, 255, 0.6);
     font-size: 12px;

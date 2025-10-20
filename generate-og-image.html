@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate OG Image</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        canvas {
+            border: 2px solid #333;
+            display: block;
+            margin: 20px auto;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 15px 30px;
+            font-size: 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Kaaro Fireworks - OG Image Generator</h1>
+    <canvas id="ogCanvas" width="1200" height="630"></canvas>
+    <button onclick="downloadImage()">Download OG Image</button>
+    
+    <script>
+        const canvas = document.getElementById('ogCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Draw background
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, '#000428');
+        gradient.addColorStop(1, '#004e92');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw stars
+        ctx.fillStyle = '#ffffff';
+        for (let i = 0; i < 100; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height * 0.6;
+            const size = Math.random() * 2;
+            ctx.globalAlpha = Math.random() * 0.8 + 0.2;
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        
+        // Draw fireworks
+        ctx.globalCompositeOperation = 'lighter';
+        
+        // Firework 1 - Red/Orange
+        drawFirework(300, 200, '#ff3300', 80);
+        
+        // Firework 2 - Blue/Cyan
+        drawFirework(600, 150, '#00ccff', 100);
+        
+        // Firework 3 - Yellow/Gold
+        drawFirework(900, 250, '#ffcc00', 90);
+        
+        // Firework 4 - Purple
+        drawFirework(450, 400, '#cc00ff', 70);
+        
+        // Firework 5 - Green
+        drawFirework(800, 380, '#00ff66', 85);
+        
+        ctx.globalCompositeOperation = 'source-over';
+        
+        // Draw title
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 80px Arial';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 20;
+        ctx.fillText('Kaaro Fireworks', canvas.width / 2, canvas.height - 150);
+        
+        // Draw subtitle
+        ctx.font = '32px Arial';
+        ctx.fillStyle = '#cccccc';
+        ctx.fillText('Interactive Canvas Fireworks Experience', canvas.width / 2, canvas.height - 90);
+        
+        // Draw features
+        ctx.font = '24px Arial';
+        ctx.fillStyle = '#aaaaaa';
+        ctx.fillText('✨ Custom Shapes • 🎵 Immersive Audio • 📱 Mobile Optimized', canvas.width / 2, canvas.height - 40);
+        
+        ctx.shadowBlur = 0;
+        
+        function drawFirework(x, y, color, particleCount) {
+            for (let i = 0; i < particleCount; i++) {
+                const angle = (i / particleCount) * Math.PI * 2;
+                const speed = Math.random() * 40 + 30;
+                const endX = x + Math.cos(angle) * speed;
+                const endY = y + Math.sin(angle) * speed;
+                
+                // Draw particle trail
+                const gradient = ctx.createLinearGradient(x, y, endX, endY);
+                gradient.addColorStop(0, color);
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+                
+                // Draw particle glow
+                ctx.fillStyle = color;
+                ctx.globalAlpha = 0.8;
+                ctx.beginPath();
+                ctx.arc(endX, endY, 3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Extra glow
+                ctx.globalAlpha = 0.3;
+                ctx.beginPath();
+                ctx.arc(endX, endY, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+        
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'og-image.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>

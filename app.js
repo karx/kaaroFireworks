@@ -219,11 +219,89 @@ window.addEventListener('resize', resizeCanvas);
 
 // Audio Context for sound synthesis
 let audioContext;
+let masterGain;
+
+// Audio configuration
+const audioConfig = {
+    volume: 0.7,
+    preset: 'realistic',
+    enableCrackling: true
+};
+
+// Audio presets
+const audioPresets = {
+    realistic: {
+        launchFreqStart: 200,
+        launchFreqEnd: 800,
+        launchDuration: 0.3,
+        explosionVariations: 3,
+        cracklingIntensity: 0.3,
+        reverbAmount: 0.4
+    },
+    cartoonish: {
+        launchFreqStart: 400,
+        launchFreqEnd: 1200,
+        launchDuration: 0.2,
+        explosionVariations: 5,
+        cracklingIntensity: 0.6,
+        reverbAmount: 0.2
+    },
+    minimal: {
+        launchFreqStart: 300,
+        launchFreqEnd: 600,
+        launchDuration: 0.15,
+        explosionVariations: 1,
+        cracklingIntensity: 0,
+        reverbAmount: 0.1
+    }
+};
 
 function initAudio() {
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Create master gain node for volume control
+        masterGain = audioContext.createGain();
+        masterGain.gain.value = audioConfig.volume;
+        masterGain.connect(audioContext.destination);
     }
+}
+
+// Create reverb effect
+function createReverb() {
+    const convolver = audioContext.createConvolver();
+    const rate = audioContext.sampleRate;
+    const length = rate * 2;
+    const impulse = audioContext.createBuffer(2, length, rate);
+    const impulseL = impulse.getChannelData(0);
+    const impulseR = impulse.getChannelData(1);
+    
+    for (let i = 0; i < length; i++) {
+        const decay = Math.pow(1 - i / length, 2);
+        impulseL[i] = (Math.random() * 2 - 1) * decay;
+        impulseR[i] = (Math.random() * 2 - 1) * decay;
+    }
+    
+    convolver.buffer = impulse;
+    return convolver;
+}
+
+// Create stereo panner based on position
+function createPanner(x) {
+    const panner = audioContext.createStereoPanner();
+    const normalizedX = (x / canvas.width) * 2 - 1; // -1 to 1
+    panner.pan.value = Math.max(-1, Math.min(1, normalizedX));
+    return panner;
+}
+
+// Calculate distance-based volume
+function getDistanceVolume(x, y) {
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const distance = Math.hypot(x - centerX, y - centerY);
+    const maxDistance = Math.hypot(canvas.width / 2, canvas.height / 2);
+    const normalizedDistance = distance / maxDistance;
+    return 1 - (normalizedDistance * 0.5); // 50% to 100% volume based on distance
 }
 
 // Firework class - the rocket that launches
@@ -257,22 +335,27 @@ class Firework {
     playLaunchSound() {
         if (!audioContext) return;
         
+        const preset = audioPresets[audioConfig.preset];
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
+        const panner = createPanner(this.x);
+        const distanceVolume = getDistanceVolume(this.x, this.y);
         
         oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
+        gainNode.connect(panner);
+        panner.connect(masterGain);
         
         // Rising pitch for whoosh effect
-        oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
-        oscillator.frequency.linearRampToValueAtTime(800, audioContext.currentTime + 0.3);
+        oscillator.frequency.setValueAtTime(preset.launchFreqStart, audioContext.currentTime);
+        oscillator.frequency.linearRampToValueAtTime(preset.launchFreqEnd, audioContext.currentTime + preset.launchDuration);
         
-        // Volume envelope
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        // Volume envelope with distance
+        const baseVolume = 0.1 * distanceVolume;
+        gainNode.gain.setValueAtTime(baseVolume, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + preset.launchDuration);
         
         oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.3);
+        oscillator.stop(audioContext.currentTime + preset.launchDuration);
     }
     
     update() {
@@ -448,7 +531,7 @@ class Particle {
 // Create explosion at position
 function createExplosion(x, y, type = null) {
     // Play explosion sound
-    playExplosionSound();
+    playExplosionSound(x, y);
     
     // Random explosion type if not specified
     if (!type) {
@@ -480,8 +563,12 @@ function createExplosion(x, y, type = null) {
     }
 }
 
-function playExplosionSound() {
+function playExplosionSound(x, y) {
     if (!audioContext) return;
+    
+    const preset = audioPresets[audioConfig.preset];
+    const variation = Math.floor(Math.random() * preset.explosionVariations);
+    const distanceVolume = getDistanceVolume(x, y);
     
     // Create white noise buffer
     const bufferSize = audioContext.sampleRate * 0.5;
@@ -497,22 +584,83 @@ function playExplosionSound() {
     
     const gainNode = audioContext.createGain();
     const filter = audioContext.createBiquadFilter();
+    const panner = createPanner(x);
+    const reverb = createReverb();
+    const reverbGain = audioContext.createGain();
+    const dryGain = audioContext.createGain();
     
+    // Audio routing: noise -> filter -> split to dry and reverb
     noise.connect(filter);
-    filter.connect(gainNode);
-    gainNode.connect(audioContext.destination);
     
-    // Filter settings
+    // Dry signal
+    filter.connect(dryGain);
+    dryGain.connect(gainNode);
+    
+    // Reverb signal
+    filter.connect(reverb);
+    reverb.connect(reverbGain);
+    reverbGain.connect(gainNode);
+    
+    // Pan and connect to master
+    gainNode.connect(panner);
+    panner.connect(masterGain);
+    
+    // Reverb mix
+    dryGain.gain.value = 1 - preset.reverbAmount;
+    reverbGain.gain.value = preset.reverbAmount;
+    
+    // Filter settings with variation
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(2000, audioContext.currentTime);
-    filter.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.3);
+    const startFreq = 2000 + (variation * 500);
+    const endFreq = 100 + (variation * 50);
+    filter.frequency.setValueAtTime(startFreq, audioContext.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(endFreq, audioContext.currentTime + 0.3);
     
-    // Volume envelope for boom
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    // Volume envelope for boom with distance
+    const baseVolume = 0.3 * distanceVolume;
+    gainNode.gain.setValueAtTime(baseVolume, audioContext.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
     
     noise.start(audioContext.currentTime);
     noise.stop(audioContext.currentTime + 0.3);
+    
+    // Add crackling sounds
+    if (preset.cracklingIntensity > 0 && audioConfig.enableCrackling) {
+        playCracklingSound(x, y, preset.cracklingIntensity);
+    }
+}
+
+// Crackling/popping particle sounds
+function playCracklingSound(x, y, intensity) {
+    if (!audioContext || intensity === 0) return;
+    
+    const crackleCount = Math.floor(Math.random() * 5 + 3) * intensity;
+    const distanceVolume = getDistanceVolume(x, y);
+    
+    for (let i = 0; i < crackleCount; i++) {
+        setTimeout(() => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const panner = createPanner(x + (Math.random() - 0.5) * 100);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(panner);
+            panner.connect(masterGain);
+            
+            // Random high-pitched pop
+            const freq = Math.random() * 2000 + 3000;
+            oscillator.frequency.value = freq;
+            oscillator.type = 'square';
+            
+            // Very short burst
+            const volume = (Math.random() * 0.05 + 0.02) * intensity * distanceVolume;
+            gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.05);
+        }, Math.random() * 200 + 50);
+    }
 }
 
 // Launch a firework
@@ -626,6 +774,27 @@ bgOptions.forEach(btn => {
 // Explosion type selection
 explosionTypeSelect.addEventListener('change', (e) => {
     selectedExplosionType = e.target.value;
+});
+
+// Volume control
+const volumeSlider = document.getElementById('volumeSlider');
+const volumeValue = document.getElementById('volumeValue');
+
+volumeSlider.addEventListener('input', (e) => {
+    const volume = e.target.value / 100;
+    audioConfig.volume = volume;
+    volumeValue.textContent = e.target.value + '%';
+    
+    if (masterGain) {
+        masterGain.gain.value = volume;
+    }
+});
+
+// Audio preset selection
+const audioPresetSelect = document.getElementById('audioPreset');
+
+audioPresetSelect.addEventListener('change', (e) => {
+    audioConfig.preset = e.target.value;
 });
 
 // Update createExplosion calls to use selected type

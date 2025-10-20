@@ -68,7 +68,7 @@ A prioritized roadmap for implementing features from the wishlist.
 - [ ] Preset shows (4-5 choreographed sequences)
 - [ ] Show editor (basic timeline)
 - [ ] Screenshot capture
-- [ ] GIF recording
+- [ ] GIF recording     
 
 **Impact:** Professional-grade control and shareability
 
