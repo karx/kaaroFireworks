@@ -303,3 +303,12 @@ Procedurally Generated Gunshot Sounds in the Web Audio API : r/proceduralgenerat
 How to Generate Noise with the Web Audio API - Noisehack, accessed on October 20, 2025, https://noisehack.com/generate-noise-web-audio-api/
 GainNode | React Native Audio API, accessed on October 20, 2025, https://docs.swmansion.com/react-native-audio-api/docs/effects/gain-node/
 Getting started with Web Audio API | Articles - web.dev, accessed on October 20, 2025, https://web.dev/articles/webaudio-intro
+
+## Variation: ASCII → real-time 3D (Diwali pataka)
+
+`ascii-to-3d.html` (branch `variation/ascii-to-3d`) opens with animated ASCII patakas. Each glyph then turns into an HDR spark that flies into a live three.js scene and settles there: flames land on diya wicks, anar and chakri glyphs on those props, and letters and stars go up into the sky. After that it is the classic show in 3D, with the same mechanics.
+
+- The classic scripts (`config`, `performance`, `audio`, `particles`, `fireworks`, `sync`, `show-editor`, `ui`) load unchanged and own all input, UI, physics and audio. `js/ascii-to-3d.js` replaces only `main.js`: it steps the classic simulation at a fixed 60 Hz and renders that state in 3D.
+- Rendering: WebGL2, HDR, ACES tone mapping, UnrealBloom, film grain and vignette. The ground is wet tiles with a planar reflection, and a Poly Haven CC0 night HDRI provides PBR reflections. The scene includes a moon, twinkling stars, a 3D city skyline, PBR clay diyas with flickering lights, an anar fountain, a spinning chakri, rocket models, smoke sprites, and dynamic point lights for each burst.
+- The page adapts its pixel ratio and drops the reflection on slow GPUs. Mobile gets particle and light caps. With `prefers-reduced-motion`, the intro is a still frame with a short fade and no camera sway.
+- `?phase=3d` skips the intro, and `?hold` freezes it. three.js r160 is vendored in `vendor/three` (MIT).

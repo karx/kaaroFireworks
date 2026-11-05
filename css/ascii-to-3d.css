@@ -1,0 +1,16 @@
+/* ASCII -> 3D variation. Layered on top of the classic style.css. */
+#gl{position:fixed;inset:0;width:100vw;height:100vh;display:block;z-index:0}
+#fireworksCanvas{position:fixed;inset:0;z-index:1;opacity:0}
+.controls{z-index:10}
+#ascii{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;margin:0;pointer-events:none;
+  font:clamp(7px,1.45vw,15px)/1.05 ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;color:#ffcf6b;
+  text-shadow:0 0 6px #ff9a2a,0 0 16px #ff5a1f66;white-space:pre;transition:opacity .9s ease}
+#introUi{position:fixed;left:0;right:0;bottom:calc(22px + env(safe-area-inset-bottom));z-index:21;text-align:center;color:#f5e9d0;font-size:.95rem;transition:opacity .6s}
+#introUi p{opacity:.8;margin-bottom:.7em}
+#introUi button{font:inherit;padding:.65em 1.2em;min-height:44px;border-radius:999px;border:1px solid #ffcf6b66;background:#1a0f05aa;color:#ffe2a8;cursor:pointer}
+body.intro .controls,body.intro #fireworksCanvas{visibility:hidden}
+body:not(.intro) #introUi{opacity:0;pointer-events:none}
+body.dissolve #ascii{opacity:0}
+body.dissolve #introUi{opacity:0;pointer-events:none}
+.controls a{color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center}
+body.intro .controls{display:none}
