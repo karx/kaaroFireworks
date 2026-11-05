@@ -1,31 +1,536 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Kaaro Fireworks: ASCII to 3D (Diwali variation)</title>
-<meta name="description" content="Diwali pataka: animated ASCII firecrackers that dissolve into a 3D particle show and a photoreal scene.">
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/ascii-to-3d.css">
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>Kaaro Fireworks 3D: ASCII to real-time Diwali (variation)</title>
+    <meta name="title" content="Digital Diwali is Green Diwali.">
+    <meta name="description" content="Wishing you all a very Happy Diwali from Arora Family.">
+    <meta name="keywords" content="fireworks, interactive, canvas, javascript, animation, web audio, fireworks simulator, online fireworks, virtual fireworks, celebration">
+    <meta name="author" content="Kaaro">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="theme-color" content="#000428">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pattaka.netlify.app/">
+    <meta property="og:title" content="Digital Diwali is Green Diwali">
+    <meta property="og:description" content="Wishing you all a very Happy Diwali from Arora Family.">
+    <meta property="og:image" content="https://pattaka.netlify.app/og_image-4.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Kaaro Fireworks - Interactive fireworks display with colorful explosions">
+    <meta property="og:site_name" content="Kaaro Fireworks">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://pattaka.netlify.app/">
+    <meta property="twitter:title" content="Digital Diwali is Green Diwali">
+    <meta property="twitter:description" content="Wishing you all a very Happy Diwali from Arora Family.">
+    
+    <meta property="twitter:description" content="Experience stunning interactive fireworks in your browser! Custom shapes, immersive audio, and mobile-optimized. Click anywhere to launch beautiful fireworks.">
+    <meta property="twitter:image" content="https://pattaka.netlify.app/og_image-4.png">
+    <meta property="twitter:image:alt" content="Kaaro Fireworks - Interactive fireworks display">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://pattaka.netlify.app/ascii-to-3d.html">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-hz0gJn5upesI9m5qqO4-8.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Kaaro Fireworks",
+      "description": "Interactive canvas-based fireworks simulator with custom shapes, immersive audio, and mobile optimization. Experience realistic fireworks physics and sound effects in your browser.",
+      "url": "https://pattaka.netlify.app/",
+      "applicationCategory": "EntertainmentApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "screenshot": "https://pattaka.netlify.app/og_image-4.png",
+      "author": {
+        "@type": "Person",
+        "name": "Kaaro"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5",
+        "ratingCount": "1"
+      },
+      "featureList": [
+        "Interactive fireworks simulation",
+        "Custom explosion shapes (star, heart, ring)",
+        "Multiple explosion types (willow, chrysanthemum, palm)",
+        "Immersive Web Audio API sound effects",
+        "Stereo panning and reverb",
+        "Mobile-optimized controls",
+        "Starry night and city skyline backgrounds",
+        "Real-time particle physics",
+        "Touch and click support"
+      ]
+    }
+    </script>
+    <link rel="stylesheet" href="css/ascii-to-3d.css">
+    <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
 </head>
-<body>
-  <picture id="photo" aria-hidden="true">
-    <source media="(orientation: portrait)" srcset="assets/variation/diwali-hero-portrait.webp" type="image/webp">
-    <source srcset="assets/variation/diwali-hero-landscape.webp" type="image/webp">
-    <img src="assets/variation/diwali-hero-landscape.jpg" alt="">
-  </picture>
-  <canvas id="gl" aria-hidden="true"></canvas>
-  <pre id="ascii" aria-label="Animated ASCII art of Diwali firecrackers"></pre>
-  <div id="ui">
-    <h1>Shubh Deepavali <span>✦</span></h1>
-    <p id="caption">ASCII patakas…</p>
-    <div class="btns">
-      <button id="replay" type="button">↺ Replay</button>
-      <button id="skip" type="button">Skip to 3D →</button>
-      <a href="index.html">Classic show</a>
+<body class="intro">
+    <canvas id="gl" aria-hidden="true"></canvas>
+    <pre id="ascii" aria-label="Animated ASCII art of Diwali firecrackers"></pre>
+    <div id="introUi"><p id="caption">ASCII patakas…</p><button id="skipIntro" type="button">Skip to 3D →</button></div>
+    <canvas id="fireworksCanvas"></canvas>
+    
+    <div id="panelBackdrop" class="panel-backdrop hidden"></div>
+    
+    <div id="profiler" class="profiler hidden">
+        <div class="profiler-item">
+            <span class="profiler-label">FPS:</span>
+            <span class="profiler-value" id="fpsValue">60</span>
+        </div>
+        <div class="profiler-item">
+            <span class="profiler-label">Particles:</span>
+            <span class="profiler-value" id="particleCount">0</span>
+        </div>
+        <div class="profiler-item">
+            <span class="profiler-label">Pool:</span>
+            <span class="profiler-value" id="poolSize">0</span>
+        </div>
+        <div class="profiler-item">
+            <span class="profiler-label">Fireworks:</span>
+            <span class="profiler-value" id="fireworkCount">0</span>
+        </div>
     </div>
-  </div>
-  <script type="module" src="js/ascii-to-3d.js"></script>
+    
+    <div class="controls">
+        <button id="autoLaunch" class="btn-primary">Auto Launch</button>
+        <!-- <button id="showEditorToggle" class="btn-primary">🎬 Show Editor</button> -->
+        <button id="settingsToggle" class="btn-secondary">⚙️</button>
+        <button id="shareToggle" class="btn-secondary">📤</button>
+        <a href="about.html" class="btn-secondary about-link" title="About">ℹ️</a>
+        <a href="index.html" class="btn-secondary about-link" title="Classic 2D show">2D</a>
+    </div>
+    
+    <div id="settingsPanel" class="settings-panel hidden">
+        <div class="panel-header">
+            <h3>Settings</h3>
+            <button class="panel-close" id="settingsClose">✕</button>
+        </div>
+        
+        <div class="setting-group">
+            <label>Background</label>
+            <div class="button-group">
+                <button class="bg-option active" data-bg="starry">⭐ Starry</button>
+                <button class="bg-option" data-bg="city">🏙️ City</button>
+                <button class="bg-option" data-bg="black">⬛ Black</button>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <label>Firework Style</label>
+            <div class="style-grid" id="styleGrid">
+                <button class="style-btn active" data-style="random" title="Random - Surprise me!">
+                    <span class="style-icon">🎲</span>
+                    <span class="style-name">Random</span>
+                </button>
+                <button class="style-btn" data-style="sphere" title="Sphere - Classic burst">
+                    <span class="style-icon">💥</span>
+                    <span class="style-name">Sphere</span>
+                </button>
+                <button class="style-btn" data-style="star" title="Star - 5-pointed star">
+                    <span class="style-icon">⭐</span>
+                    <span class="style-name">Star</span>
+                </button>
+                <button class="style-btn" data-style="heart" title="Heart - Romantic heart">
+                    <span class="style-icon">❤️</span>
+                    <span class="style-name">Heart</span>
+                </button>
+                <button class="style-btn" data-style="ring" title="Ring - Perfect circle">
+                    <span class="style-icon">⭕</span>
+                    <span class="style-name">Ring</span>
+                </button>
+                <button class="style-btn" data-style="willow" title="Willow - Drooping trails">
+                    <span class="style-icon">🌿</span>
+                    <span class="style-name">Willow</span>
+                </button>
+                <button class="style-btn" data-style="chrysanthemum" title="Chrysanthemum - Multi-burst">
+                    <span class="style-icon">🌸</span>
+                    <span class="style-name">Chrysan.</span>
+                </button>
+                <button class="style-btn" data-style="palm" title="Palm - Palm tree effect">
+                    <span class="style-icon">🌴</span>
+                    <span class="style-name">Palm</span>
+                </button>
+                <button class="style-btn" data-style="spiral" title="Spiral - Rotating burst">
+                    <span class="style-icon">🌀</span>
+                    <span class="style-name">Spiral</span>
+                </button>
+                <button class="style-btn" data-style="crossette" title="Crossette - Split bursts">
+                    <span class="style-icon">✨</span>
+                    <span class="style-name">Crossette</span>
+                </button>
+                <button class="style-btn" data-style="peony" title="Peony - Dense center">
+                    <span class="style-icon">🌺</span>
+                    <span class="style-name">Peony</span>
+                </button>
+                <button class="style-btn" data-style="doubleRing" title="Double Ring - Concentric circles">
+                    <span class="style-icon">⭕⭕</span>
+                    <span class="style-name">Double</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <label>Volume <span id="volumeValue">70%</span></label>
+            <input type="range" id="volumeSlider" min="0" max="100" value="70" class="slider">
+        </div>
+        
+        <div class="setting-group">
+            <label>Audio Preset</label>
+            <select id="audioPreset">
+                <option value="realistic">🎵 Realistic (Samples)</option>
+                <option value="epic">🎆 Epic (Samples)</option>
+                <option value="minimal">🔇 Minimal (Samples)</option>
+                <option value="cartoonish">🎪 Cartoonish (Samples)</option>
+                <option value="balanced">⚖️ Balanced (Samples)</option>
+                <option value="synthesized">🎹 Synthesized</option>
+            </select>
+        </div>
+        
+        <div class="setting-group">
+            <label>Reverb <span id="reverbValue">40%</span></label>
+            <input type="range" id="reverbSlider" min="0" max="100" value="40" class="slider">
+        </div>
+        
+        <div class="setting-group">
+            <label>Text Explosions</label>
+            <div class="save-config-group">
+                <input type="text" id="textInput" placeholder="Enter text..." maxlength="20">
+                <button class="action-btn-small" id="launchTextBtn">🔤 Launch</button>
+            </div>
+            <div style="margin-top: 8px;">
+                <input type="range" id="textSize" min="50" max="200" value="100" class="slider">
+                <label style="font-size: 11px; color: rgba(255,255,255,0.6);">Size: <span id="textSizeValue">100</span>px</label>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <label>Image/Logo Explosions</label>
+            <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+            <button class="action-btn" id="uploadImageBtn">📁 Upload Image</button>
+            <div style="margin-top: 8px;">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="useImageColors" checked>
+                    <span>Use Image Colors</span>
+                </label>
+            </div>
+            <div style="margin-top: 8px;">
+                <input type="range" id="imageSize" min="100" max="500" value="300" class="slider">
+                <label style="font-size: 11px; color: rgba(255,255,255,0.6);">Size: <span id="imageSizeValue">300</span>px</label>
+            </div>
+            <div style="margin-top: 8px; font-size: 10px; color: rgba(255,255,255,0.4); font-style: italic;">
+                Note: Images are not synchronized in multi-user mode
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <label>Performance</label>
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="adaptiveQuality" checked>
+                    <span>Adaptive Quality</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="batterySaving">
+                    <span>Battery Saving</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="reducedMotion">
+                    <span>Reduced Motion</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showProfiler">
+                    <span>Show Profiler</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="info">Tap anywhere to launch!</div>
+    </div>
+    
+    <div id="sharePanel" class="settings-panel hidden">
+        <div class="panel-header">
+            <h3>Share & Save</h3>
+            <button class="panel-close" id="shareClose">✕</button>
+        </div>
+        
+        <div class="setting-group">
+            <label>Multi-User Sync 🌐</label>
+            <div id="syncNotConnected">
+                <div class="save-config-group">
+                    <input type="text" id="userName" placeholder="Your name..." maxlength="20" value="Guest">
+                    <button class="action-btn-small" id="createRoomBtn">🎪 Create Room</button>
+                </div>
+                <div class="save-config-group" style="margin-top: 8px;">
+                    <input type="text" id="roomCodeInput" placeholder="Room code..." maxlength="6" style="text-transform: uppercase;">
+                    <button class="action-btn-small" id="joinRoomBtn">🚪 Join</button>
+                </div>
+            </div>
+            <div id="syncConnected" class="hidden">
+                <div style="background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 10px; padding: 12px; margin-bottom: 12px;">
+                    <div style="font-size: 13px; font-weight: 600; color: rgba(134, 239, 172, 1); margin-bottom: 4px;">
+                        🎪 Room: <span id="currentRoomCode" style="font-family: monospace; font-size: 16px;"></span>
+                    </div>
+                    <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6);">
+                        <span id="participantCount">0</span> participant(s) connected
+                    </div>
+                </div>
+                <div id="participantList" style="max-height: 100px; overflow-y: auto; margin-bottom: 12px;"></div>
+                <div class="button-group-vertical">
+                    <button id="copyRoomLinkBtn" class="action-btn">🔗 Copy Room Link</button>
+                    <button id="leaveRoomBtn" class="action-btn" style="background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3);">🚪 Leave Room</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <label>Quick Actions</label>
+            <div class="button-group-vertical">
+                <button id="captureBtn" class="action-btn">📸 Capture Screenshot</button>
+                <button id="copyLinkBtn" class="action-btn">🔗 Copy Share Link</button>
+                <button id="qrCodeBtn" class="action-btn">📱 Show QR Code</button>
+                <button id="shareBtn" class="action-btn">🚀 Share</button>
+            </div>
+        </div>
+        
+        <div id="qrCodeContainer" class="qr-code-container hidden">
+            <div id="qrCanvas"></div>
+            <div class="qr-label">Scan to share</div>
+        </div>
+        
+        <div class="setting-group">
+            <label>Preset Shows</label>
+            <div class="button-group-vertical">
+                <button class="show-btn" data-show="rainbow">🌈 Rainbow</button>
+                <button class="show-btn" data-show="cascade">💧 Cascade</button>
+                <button class="show-btn" data-show="finale">🎆 Finale</button>
+                <button class="show-btn" data-show="symmetry">⚖️ Symmetry</button>
+                <button class="show-btn" data-show="celebration">🎉 Celebration</button>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <label>Save Configuration</label>
+            <div class="save-config-group">
+                <input type="text" id="configName" placeholder="My Config" maxlength="20">
+                <button id="saveConfigBtn" class="action-btn-small">💾 Save</button>
+            </div>
+            <div id="savedConfigsList" class="saved-configs-list"></div>
+        </div>
+        
+        <div id="shareMessage" class="share-message hidden"></div>
+    </div>
+    
+    <!-- Show Editor Panel -->
+    <div id="showEditorPanel" class="show-editor-panel hidden">
+        <div class="panel-header">
+            <h3>🎬 Show Editor</h3>
+            <button class="panel-close" id="showEditorClose">✕</button>
+        </div>
+        
+        <div class="show-info">
+            <input type="text" id="showName" placeholder="Show Name" value="Untitled Show" class="show-name-input">
+            <div class="show-duration">
+                <span>Duration: </span>
+                <span id="showDuration">0:00</span>
+            </div>
+        </div>
+        
+        <div class="playback-controls">
+            <button id="playShow" class="btn-icon" title="Play">▶</button>
+            <button id="pauseShow" class="btn-icon" title="Pause" disabled>⏸</button>
+            <button id="stopShow" class="btn-icon" title="Stop">⏹</button>
+            <button id="resetShow" class="btn-icon" title="Reset">⏮</button>
+            <div class="playback-time">
+                <span id="currentTime">0:00</span>
+                <span> / </span>
+                <span id="totalTime">0:00</span>
+            </div>
+        </div>
+        
+        <div class="timeline-container">
+            <div class="timeline-header">
+                <span>Timeline</span>
+                <div class="timeline-zoom">
+                    <button id="zoomOut" class="btn-icon-sm">−</button>
+                    <span id="zoomLevel">1x</span>
+                    <button id="zoomIn" class="btn-icon-sm">+</button>
+                </div>
+            </div>
+            <div class="timeline-canvas-wrapper">
+                <canvas id="timelineCanvas" width="600" height="100"></canvas>
+                <div id="timelinePlayhead" class="timeline-playhead"></div>
+            </div>
+            <div class="timeline-ruler" id="timelineRuler"></div>
+        </div>
+        
+        <div class="event-controls">
+            <button id="addEvent" class="btn-secondary">+ Add Event</button>
+            <button id="addBurst" class="btn-secondary">💥 Add Burst</button>
+            <button id="addFinale" class="btn-secondary">🎆 Add Finale</button>
+            <button id="deleteEvent" class="btn-secondary" disabled>🗑 Delete</button>
+        </div>
+        
+        <div class="event-properties" id="eventProperties">
+            <h4>Event Properties</h4>
+            <div class="property-group">
+                <label>Time (seconds)</label>
+                <input type="number" id="eventTime" min="0" step="0.1" disabled>
+            </div>
+            <div class="property-group">
+                <label>Type</label>
+                <select id="eventType" disabled>
+                    <option value="firework">Single Firework</option>
+                    <option value="burst">Burst</option>
+                    <option value="finale">Finale</option>
+                </select>
+            </div>
+            <div id="fireworkProperties" class="type-properties">
+                <div class="property-group">
+                    <label>Position X (0-1)</label>
+                    <input type="number" id="eventX" min="0" max="1" step="0.01" value="0.5" disabled>
+                </div>
+                <div class="property-group">
+                    <label>Position Y (0-1)</label>
+                    <input type="number" id="eventY" min="0" max="1" step="0.01" value="0.8" disabled>
+                </div>
+                <div class="property-group">
+                    <label>Explosion Type</label>
+                    <select id="eventExplosion" disabled>
+                        <option value="random">Random</option>
+                        <option value="standard">Standard</option>
+                        <option value="willow">Willow</option>
+                        <option value="chrysanthemum">Chrysanthemum</option>
+                        <option value="palm">Palm</option>
+                        <option value="star">Star</option>
+                        <option value="heart">Heart</option>
+                        <option value="ring">Ring</option>
+                    </select>
+                </div>
+            </div>
+            <div id="burstProperties" class="type-properties hidden">
+                <div class="property-group">
+                    <label>Count</label>
+                    <input type="number" id="burstCount" min="1" max="20" value="5" disabled>
+                </div>
+                <div class="property-group">
+                    <label>Spread (0-1)</label>
+                    <input type="number" id="burstSpread" min="0" max="1" step="0.1" value="0.3" disabled>
+                </div>
+            </div>
+            <div id="finaleProperties" class="type-properties hidden">
+                <div class="property-group">
+                    <label>Duration (seconds)</label>
+                    <input type="number" id="finaleDuration" min="1" max="30" value="5" disabled>
+                </div>
+                <div class="property-group">
+                    <label>Intensity</label>
+                    <select id="finaleIntensity" disabled>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="extreme">Extreme</option>
+                    </select>
+                </div>
+                <div class="property-group">
+                    <label>Pattern</label>
+                    <select id="finalePattern" disabled>
+                        <option value="random">Random</option>
+                        <option value="cascade">Cascade</option>
+                        <option value="symmetrical">Symmetrical</option>
+                        <option value="spiral">Spiral</option>
+                    </select>
+                </div>
+            </div>
+            <button id="applyEventChanges" class="btn-primary" disabled>Apply Changes</button>
+        </div>
+        
+        <div class="show-actions">
+            <button id="saveShow" class="btn-primary">💾 Save Show</button>
+            <button id="loadShow" class="btn-secondary">📁 Load Show</button>
+            <button id="exportShow" class="btn-secondary">📤 Export JSON</button>
+            <button id="importShow" class="btn-secondary">📥 Import JSON</button>
+            <button id="showGallery" class="btn-secondary">🖼️ Gallery</button>
+        </div>
+        
+        <div class="show-settings">
+            <h4>Show Settings</h4>
+            <div class="property-group">
+                <label>
+                    <input type="checkbox" id="showLoop">
+                    Loop Show
+                </label>
+            </div>
+            <div class="property-group" id="loopCountGroup" style="display: none;">
+                <label>Loop Count</label>
+                <input type="number" id="loopCount" min="1" max="100" value="1">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Show Gallery Modal -->
+    <div id="showGalleryModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Show Gallery</h3>
+                <button class="modal-close" id="galleryClose">✕</button>
+            </div>
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Gallery items will be populated here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- Firebase SDK (for multi-user sync) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Load modules in dependency order -->
+    <script src="js/analytics.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/performance.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/fireworks.js"></script>
+    <script src="js/sync.js"></script>
+    <script src="js/show-editor.js"></script>
+    <script src="js/ui.js"></script>
+    <script type="module" src="js/ascii-to-3d.js"></script>
 </body>
 </html>
