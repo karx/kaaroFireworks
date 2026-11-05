@@ -22,9 +22,9 @@ const Q = {
   diyaLights: MOBILE ? 2 : 5,
   stars: MOBILE ? 900 : 2200,
   dpr: Math.min(devicePixelRatio, MOBILE ? 1.5 : 2),
-  bloomStrength: MOBILE ? 0.9 : 1.2,
-  bloomRadius: MOBILE ? 0.45 : 0.7,
-  bloomThreshold: 0.22,
+  bloomStrength: MOBILE ? 0.45 : 0.55,
+  bloomRadius: MOBILE ? 0.28 : 0.4,
+  bloomThreshold: 0.68,
   streaks: !REDUCE,
   crackle: !REDUCE,
   ca: REDUCE ? 0 : (MOBILE ? 0.0007 : 0.0011),
@@ -40,7 +40,7 @@ renderer.toneMappingExposure = 0;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x000000, 0.0055); scene.fog.color.setRGB(.05, .038, .065);
+scene.fog = new THREE.FogExp2(0x000000, 0.0038); scene.fog.color.setRGB(.02, .015, .03);
 const FOV = 45, D = 50;
 const camera = new THREE.PerspectiveCamera(FOV, innerWidth / innerHeight, 0.1, 2000);
 const baseCam = camera.clone();
@@ -54,7 +54,7 @@ composer.addPass(bloom);
 const softBloom = new ShaderPass({
   uniforms: {
     tDiffuse: { value: null },
-    uAmt: { value: MOBILE ? 0.14 : 0.22 },
+    uAmt: { value: MOBILE ? 0.0 : 0.02 },
     uRes: { value: new THREE.Vector2(innerWidth, innerHeight) },
   },
   vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
@@ -75,7 +75,7 @@ const softBloom = new ShaderPass({
       blur+=texture2D(tDiffuse,vUv+vec2(-px.x*3.,-px.y*3.)).rgb;
       blur*=0.1111;
       float lum=dot(blur,vec3(0.2126,0.7152,0.0722));
-      vec3 glow=blur*smoothstep(0.35,1.4,lum);
+      vec3 glow=blur*smoothstep(0.85,1.8,lum);
       gl_FragColor=vec4(c.rgb+glow*uAmt,c.a);
     }`,
 });
@@ -213,9 +213,9 @@ const sky = new THREE.Mesh(new THREE.SphereGeometry(900, 48, 24), new THREE.Shad
   vertexShader: 'varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
   fragmentShader: `varying vec3 vP;uniform float uHaze,uFlash;uniform vec3 uFlashCol;
     void main(){float y=vP.y;
-      vec3 top=vec3(.004,.006,.02),mid=vec3(.012,.018,.05),hz=vec3(.05,.03,.028);
+      vec3 top=vec3(.002,.003,.012),mid=vec3(.006,.008,.028),hz=vec3(.028,.016,.014);
       vec3 c=mix(mid,top,smoothstep(0.,.6,y));c+=hz*uHaze*exp(-abs(y)*9.);
-      c+=uFlashCol*uFlash*exp(-abs(y-0.05)*6.)*1.4;
+      c+=uFlashCol*uFlash*exp(-abs(y-0.05)*8.)*0.28;
       gl_FragColor=vec4(c,1.);}`,
 }));
 scene.add(sky);
@@ -424,7 +424,7 @@ function tempColor(base, alpha, outR, outG, outB, i3) {
   _tmpC.copy(base);
   if (hot > 0) _tmpC.lerp(_hot, hot * 0.85);
   if (cool > 0) _tmpC.lerp(_ember, cool * 0.9);
-  const boost = 5.5 * alpha + hot * 4.0 + 0.4;
+  const boost = 3.6 * alpha + hot * 2.8 + 0.35;
   pCol[i3] = _tmpC.r * boost; pCol[i3 + 1] = _tmpC.g * boost; pCol[i3 + 2] = _tmpC.b * boost;
 }
 
@@ -438,18 +438,19 @@ const smokeMatProto = new THREE.SpriteMaterial({
   map: smokeTex, color: 0x8a8a96, transparent: true, depthWrite: false, opacity: 0, fog: true,
 });
 function smoke(x, y, z, tint) {
-  if (smokes.length > (MOBILE ? 16 : 42)) { const s = smokes.shift(); scene.remove(s.s); s.s.material.dispose(); }
+  if (smokes.length > (MOBILE ? 10 : 24)) { const s = smokes.shift(); scene.remove(s.s); s.s.material.dispose(); }
   const mat = smokeMatProto.clone();
-  // Soft volumetric look: base ash tint + burst light contamination
+  // Soft ash plume: small, desaturated, barely tinted by the burst
   mat.map = smokeTex;
-  mat.color.copy(tint).lerp(new THREE.Color(0x3a3a44), 0.88);
+  mat.color.copy(tint).lerp(new THREE.Color(0x555560), 0.985);
   mat.opacity = 0;
   const s = new THREE.Sprite(mat);
-  s.position.set(x, y, z); s.material.rotation = Math.random() * 6; s.scale.setScalar(5); scene.add(s);
+  s.position.set(x, y, z); s.material.rotation = Math.random() * 6;
+  const baseScale = 1.2 + Math.random() * 0.4; s.scale.setScalar(baseScale); s.userData.baseScale = baseScale; scene.add(s);
   smokes.push({
-    s, t: 0, life: 6.5 + Math.random() * 3.5,
-    vx: (Math.random() - 0.5) * 0.8, vy: 0.35 + Math.random() * 0.45,
-    g: 5 + Math.random() * 7, tint: tint.clone(), base: mat.color.clone(),
+    s, t: 0, life: 4.5 + Math.random() * 2.5,
+    vx: (Math.random() - 0.5) * 0.45, vy: 0.25 + Math.random() * 0.3,
+    g: 0.9 + Math.random() * 1.2, tint: tint.clone(), base: mat.color.clone(),
   });
 }
 
@@ -469,16 +470,17 @@ const pendingCrackles = [];
 function triggerBurstFX(wx, wy, wz, c, style) {
   burstLight(wx, wy, wz, c);
   smoke(wx, wy, wz - 1, c);
-  smoke(wx + (Math.random() - 0.5) * 3, wy - 1, wz - 2, c);
-  if (!MOBILE) smoke(wx - 1.5, wy + 0.5, wz - 1.5, c);
+  if (!MOBILE && Math.random() > 0.35) smoke(wx + (Math.random() - 0.5) * 2, wy - 0.8, wz - 1.5, c);
   // Distance-weighted camera shake (closer / higher = stronger).
   const dx = wx - camera.position.x, dy = wy - camera.position.y, dz = wz - camera.position.z;
   const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
   const amp = Math.min(0.7, 28 / Math.max(6, dist));
   shakeAmp = Math.max(shakeAmp, amp);
-  cityFlash = Math.max(cityFlash, 0.85 + amp);
-  sky.material.uniforms.uFlash.value = Math.max(sky.material.uniforms.uFlash.value, 0.55 + amp * 0.6);
-  sky.material.uniforms.uFlashCol.value.copy(c);
+  cityFlash = Math.min(0.55, Math.max(cityFlash, 0.25 + amp * 0.35));
+  // Clamp haze pulse so overlapping bursts cannot bleach the night sky.
+  const flashTarget = Math.min(0.18, 0.08 + amp * 0.12);
+  sky.material.uniforms.uFlash.value = Math.min(0.18, Math.max(sky.material.uniforms.uFlash.value, flashTarget));
+  sky.material.uniforms.uFlashCol.value.copy(c).lerp(new THREE.Color(1, 0.9, 0.75), 0.5);
   // Crackle / strobe sub-bursts (game VFX "secondary pops").
   if (Q.crackle) {
     const n = MOBILE ? 2 : 4 + ((style === 'chrysanthemum' || style === 'crossette') ? 3 : 0);
@@ -591,7 +593,7 @@ function drawClassic(dt) {
       emit(wq.x, wq.y, wq.z, a, a * .8, a * .5, .55);
     });
     emit(wp.x, wp.y, wp.z, 7, 5.5, 3.5, 1.15);
-    if (Q.streaks) emitStreak(wp.x, wp.y, wp.z, f.vx * s, -f.vy * s, 0, 4, 2.2, 0.9, Math.hypot(f.vx, f.vy) * s * 0.35, 0.25);
+    if (Q.streaks) emitStreak(wp.x, wp.y, wp.z, f.vx * s, -f.vy * s, 0, 2.2, 1.2, 0.5, Math.min(2.2, Math.hypot(f.vx, f.vy) * s * 0.22), 0.12);
   }
   for (const [f, m] of rocketMeshes) if (!live.has(f)) {
     scene.remove(m); rocketMeshes.delete(f);
@@ -605,7 +607,7 @@ function drawClassic(dt) {
     if (p._glitter) a *= 0.35 + 0.65 * Math.abs(Math.sin(p.twinklePhase * 3.7 + (p._born || 0) * 0.01));
     if (a <= 0) continue;
     const c = col(p.color); pxToWorld(p.x, p.y, wp); const z = (p._z || 0) * s;
-    const sizeMul = p._peony && a > 0.6 ? 3.8 : (a > .7 ? 3.5 : 2.5);
+    const sizeMul = p._peony && a > 0.6 ? 2.8 : (a > .7 ? 2.6 : 2.0);
     const size = p.size * s * 2 * sizeMul;
     if (pN < pCap) {
       const i = pN; emit(wp.x, wp.y, wp.z + z, 0, 0, 0, size);
@@ -617,11 +619,11 @@ function drawClassic(dt) {
     // Velocity-stretched motion blur for fast sparks.
     if (Q.streaks) {
       const spd = Math.hypot(p.vx, p.vy, p._vz || 0);
-      if (spd > 1.2 && a > 0.15) {
-        const len = Math.min(4.5, spd * s * 0.55);
-        const boost = a * 3.2;
+      if (spd > 2.0 && a > 0.25) {
+        const len = Math.min(2.4, spd * s * 0.32);
+        const boost = a * 2.0;
         emitStreak(wp.x, wp.y, wp.z + z, p.vx * s, -p.vy * s, (p._vz || 0) * s,
-          c.r * boost * 1.4 + a, c.g * boost * 1.1 + a * 0.6, c.b * boost * 0.7 + a * 0.3, len, Math.max(0.08, p.size * s * 0.45));
+          c.r * boost + a * 0.4, c.g * boost * 0.85 + a * 0.25, c.b * boost * 0.55 + a * 0.15, len, Math.max(0.05, p.size * s * 0.22));
       }
     }
     if (p.hasTrail && p.trail.length > 1) {
@@ -641,13 +643,13 @@ function drawClassic(dt) {
 let chakriAngle = 0;
 function ambient(dt, t) {
   const ap = anar.getWorldPosition(wp); const tip = ap.y + 1.7;
-  const fl = .8 + Math.sin(t * 31) * .1 + Math.random() * .2; anarLight.intensity = (REDUCE ? 60 : 160) * fl;
+  const fl = .8 + Math.sin(t * 31) * .1 + Math.random() * .2; anarLight.intensity = (REDUCE ? 35 : 70) * fl;
   for (let k = 0; k < (REDUCE ? 2 : MOBILE ? 6 : 14); k++) {
     const sp = 9 + Math.random() * 9, th = Math.random() * Math.PI * 2, r = Math.random() * .28;
     spark(ap.x, tip, ap.z, Math.cos(th) * r * sp, sp, Math.sin(th) * r * sp, .7 + Math.random() * .9, col(Math.random() > .3 ? '#ffc46a' : '#fff2c8'), .38, .9, 11);
   }
   chakriAngle += dt * (REDUCE ? 2 : 14); chakri.rotation.y = chakriAngle;
-  const cp = chakri.getWorldPosition(wq); chakriLight.intensity = 80 * (.7 + Math.random() * .3);
+  const cp = chakri.getWorldPosition(wq); chakriLight.intensity = 36 * (.7 + Math.random() * .3);
   for (let k = 0; k < (REDUCE ? 1 : MOBILE ? 3 : 6); k++) {
     const a = chakriAngle + k * 2.1, R = 1.5;
     spark(cp.x + Math.cos(a) * R, cp.y + .1, cp.z + Math.sin(a) * R, -Math.sin(a) * 9 + (Math.random() - .5) * 2, 1 + Math.random() * 2, Math.cos(a) * 9 + (Math.random() - .5) * 2, .4 + Math.random() * .3, col(k % 2 ? '#ffd27a' : '#ff7a3a'), .32, 1.5, 9);
@@ -677,7 +679,7 @@ function stepSparks(dt) {
     }
     if (Q.streaks && !s.target) {
       const spd = Math.hypot(s.vx, s.vy, s.vz);
-      if (spd > 3) emitStreak(s.x, s.y, s.z, s.vx, s.vy, s.vz, s.c.r * a, s.c.g * a * 0.9, s.c.b * a * 0.7, Math.min(3.5, spd * 0.12), Math.max(0.06, s.size * 0.35));
+      if (spd > 5) emitStreak(s.x, s.y, s.z, s.vx, s.vy, s.vz, s.c.r * a * 0.7, s.c.g * a * 0.55, s.c.b * a * 0.4, Math.min(2.0, spd * 0.07), Math.max(0.04, s.size * 0.2));
     }
   }
 }
@@ -685,7 +687,7 @@ function stepFx(dt) {
   for (const b of bLights) {
     b.t += dt; const e = Math.max(0, 1 - b.t / b.max);
     // Punchy flash then soft tail (game light cookie feel).
-    b.l.intensity = 12000 * e * e * (0.55 + 0.45 * Math.sin(e * Math.PI));
+    b.l.intensity = 4200 * e * e * (0.55 + 0.45 * Math.sin(e * Math.PI));
   }
   // Light smoke with burst lights (approximate nearest).
   let brightest = 0, brightCol = null;
@@ -694,12 +696,13 @@ function stepFx(dt) {
     const s = smokes[i]; s.t += dt; const k = s.t / s.life;
     if (k >= 1) { scene.remove(s.s); s.s.material.dispose(); smokes.splice(i, 1); continue; }
     s.s.position.x += s.vx * dt; s.s.position.y += s.vy * dt;
-    s.s.scale.setScalar(5 + s.g * Math.sqrt(k) * 2.6);
-    const op = Math.sin(Math.min(1, k * 3.5) * Math.PI / 2) * (1 - k) * 0.42;
+    const baseScale = s.s.userData.baseScale || 2.2;
+    s.s.scale.setScalar(baseScale + s.g * Math.sqrt(k) * 1.15);
+    const op = Math.sin(Math.min(1, k * 3.2) * Math.PI / 2) * (1 - k) * 0.07;
     const mat = s.s.material;
     mat.opacity = op;
-    // Depth-fade-ish + lit by active bursts (game soft-particle lighting)
-    const lit = Math.min(0.65, brightest / 12000);
+    // Tiny warm kiss from nearby bursts — stay mostly grey ash
+    const lit = Math.min(0.08, brightest / 12000);
     mat.color.copy(s.base);
     if (brightCol && lit > 0.02) mat.color.lerp(brightCol, lit);
   }
@@ -710,9 +713,9 @@ function stepFx(dt) {
   }
   // Skyline flash + sky haze pulse
   cityFlash = Math.max(0, cityFlash - dt * 2.8);
-  const ei = 1.6 + cityFlash * 3.5;
+  const ei = 1.6 + cityFlash * 1.4;
   for (const m of cityMats) m.emissiveIntensity = ei;
-  sky.material.uniforms.uFlash.value = Math.max(0, sky.material.uniforms.uFlash.value - dt * 2.2);
+  sky.material.uniforms.uFlash.value = Math.min(0.18, Math.max(0, sky.material.uniforms.uFlash.value - dt * 2.6));
   shakeAmp = Math.max(0, shakeAmp - dt * shakeDecay);
 }
 
@@ -813,7 +816,14 @@ function frame(now) {
     window.updateProfiler();
   }
   const e = phase === 'ascii' ? 0 : Math.min(1, (now - introStart) / (REDUCE ? 600 : 3200));
-  renderer.toneMappingExposure = 1.12 * e * (2 - e);
+  // Keep night readable: base exposure + brief dimming when several bursts overlap.
+  let burstEnergy = 0;
+  for (const b of bLights) burstEnergy += Math.max(0, b.l.intensity);
+  const overload = Math.min(0.55, burstEnergy / 12000);
+  const baseExp = 0.88 * e * (2 - e);
+  renderer.toneMappingExposure = Math.max(0.5, baseExp * (1 - overload * 0.7));
+  // Soft plate only on quiet frames — overlapping bursts must not fog the sky.
+  softBloom.uniforms.uAmt.value = overload > 0.12 ? 0 : softAmt;
   starMat.uniforms.uOpacity.value = e * (window.config.background === 'black' ? 0 : 1);
   starMat.uniforms.uTime.value = now / 1000;
   grade.uniforms.uTime.value = now / 7;
@@ -821,7 +831,7 @@ function frame(now) {
   const bg = window.config.background;
   city.visible = bg === 'city'; moon.visible = bg !== 'black';
   moonLight.intensity = bg === 'black' ? .08 : .35;
-  sky.material.uniforms.uHaze.value = bg === 'black' ? .15 : bg === 'city' ? 1.6 : 1;
+  sky.material.uniforms.uHaze.value = bg === 'black' ? .06 : bg === 'city' ? 0.7 : 0.35;
   const ease = 1 - Math.pow(1 - e, 3), sway = REDUCE ? 0 : 1;
   // Base camera + distance-weighted shake (game hit-stop style).
   const sx = (Math.random() - 0.5) * shakeAmp * 2.2;
@@ -851,9 +861,9 @@ function frame(now) {
     if (adaptive) {
       if (fpsAvg < 48 && dprNow > .6) {
         dprNow = Math.max(.6, dprNow - .2); renderer.setPixelRatio(dprNow); composer.setPixelRatio(dprNow);
-      } else if (fpsAvg < 42 && bloomStr > 0.55) {
-        bloomStr = Math.max(0.55, bloomStr - 0.2); bloom.strength = bloomStr;
-        softAmt = Math.max(0.1, softAmt - 0.08); softBloom.uniforms.uAmt.value = softAmt;
+      } else if (fpsAvg < 42 && bloomStr > 0.35) {
+        bloomStr = Math.max(0.35, bloomStr - 0.12); bloom.strength = bloomStr;
+        softAmt = Math.max(0.03, softAmt - 0.03); softBloom.uniforms.uAmt.value = softAmt;
       } else if (fpsAvg < 38 && Q.streaks) {
         Q.streaks = false; streaks.visible = false;
       } else if (fpsAvg < 36 && pCap > P * 0.45) {
