@@ -303,3 +303,7 @@ Procedurally Generated Gunshot Sounds in the Web Audio API : r/proceduralgenerat
 How to Generate Noise with the Web Audio API - Noisehack, accessed on October 20, 2025, https://noisehack.com/generate-noise-web-audio-api/
 GainNode | React Native Audio API, accessed on October 20, 2025, https://docs.swmansion.com/react-native-audio-api/docs/effects/gain-node/
 Getting started with Web Audio API | Articles - web.dev, accessed on October 20, 2025, https://web.dev/articles/webaudio-intro
+
+## Variation: ASCII → 3D (Diwali pataka)
+
+`ascii-to-3d.html` (branch `variation/ascii-to-3d`) opens with animated ASCII firecrackers: diyas, anar, chakri, and rockets bursting. After about 6.5 seconds, every lit glyph becomes a three.js particle in 3D space. The camera dollies in while the particles scatter, then an AI-generated photoreal Diwali render fades in behind live 3D bursts (tap to launch more). It respects `prefers-reduced-motion` by showing a still ASCII frame and a plain crossfade. `?phase=3d` skips straight to 3D, and `?hold` keeps the ASCII phase. The classic show (`index.html`) is unchanged.

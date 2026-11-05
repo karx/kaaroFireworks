@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kaaro Fireworks: ASCII to 3D (Diwali variation)</title>
+<meta name="description" content="Diwali pataka: animated ASCII firecrackers that dissolve into a 3D particle show and a photoreal scene.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/ascii-to-3d.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+  <picture id="photo" aria-hidden="true">
+    <source media="(orientation: portrait)" srcset="assets/variation/diwali-hero-portrait.webp" type="image/webp">
+    <source srcset="assets/variation/diwali-hero-landscape.webp" type="image/webp">
+    <img src="assets/variation/diwali-hero-landscape.jpg" alt="">
+  </picture>
+  <canvas id="gl" aria-hidden="true"></canvas>
+  <pre id="ascii" aria-label="Animated ASCII art of Diwali firecrackers"></pre>
+  <div id="ui">
+    <h1>Shubh Deepavali <span>✦</span></h1>
+    <p id="caption">ASCII patakas…</p>
+    <div class="btns">
+      <button id="replay" type="button">↺ Replay</button>
+      <button id="skip" type="button">Skip to 3D →</button>
+      <a href="index.html">Classic show</a>
+    </div>
+  </div>
+  <script type="module" src="js/ascii-to-3d.js"></script>
+</body>
+</html>
