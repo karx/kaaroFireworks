@@ -20,7 +20,4 @@
   [headers.values]
     Content-Type = "text/css; charset=utf-8"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Redirects live in _redirects only (short links). No /* catch-all: unknown paths serve 404.html with status 404.

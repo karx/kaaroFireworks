@@ -1,1 +1,13 @@
-/*    /index.html   200
+# Platform short links for the Diwali 2026 reel (RFC R-RD-1). 302 on purpose: campaign links can be repointed.
+# Netlify appends the visitor's own query string (e.g. /wa?from=Kartik), see PR notes.
+/ig   /?utm_source=instagram&utm_medium=bio&utm_campaign=diwali26_reel   302
+/yt   /?utm_source=youtube&utm_medium=shorts&utm_campaign=diwali26_reel  302
+/fb   /?utm_source=facebook&utm_medium=reel&utm_campaign=diwali26_reel   302
+/x    /?utm_source=x&utm_medium=post&utm_campaign=diwali26_reel          302
+/li   /?utm_source=linkedin&utm_medium=post&utm_campaign=diwali26_reel   302
+/wa   /?utm_source=whatsapp&utm_medium=status&utm_campaign=diwali26_reel 302
+/tg   /?utm_source=telegram&utm_medium=post&utm_campaign=diwali26_reel   302
+/3d   /ascii-to-3d?utm_source=instagram&utm_medium=reel&utm_campaign=diwali26_reel 302
+
+# No /* catch-all (RFC R-RD-2): this is a multi-page static site. Unknown paths get 404.html with a real 404.
+# Room / config / personalised links are query strings on existing pages (/?room=, /?config=, /?from=), so they need no rewrite.
