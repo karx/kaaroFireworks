@@ -264,11 +264,11 @@
       store(STORE_FROM, clean(v.from, 40)); store(STORE_TO, clean(v.to, 40));
     }
     [fFrom, fTo, fFor, fMsg, fLang, fPage].forEach(function (f) { f.input.addEventListener('input', update); f.input.addEventListener('change', update); });
-    bWa.addEventListener('click', function (e) { if (bWa.classList.contains('is-disabled')) { e.preventDefault(); fFrom.input.focus(); } else track('Share WhatsApp'); });
+    bWa.addEventListener('click', function (e) { if (bWa.classList.contains('is-disabled')) { e.preventDefault(); fFrom.input.focus(); } else { var A = window.analytics; A && A.trackShareURLGenerate('send_wishes', 'whatsapp'); } });
 
     bCopy.addEventListener('click', function () {
       var url = currentURL;
-      var done = function () { status.textContent = 'Link copied. Paste it anywhere.'; track('Share Copy'); };
+      var done = function () { status.textContent = 'Link copied. Paste it anywhere.'; var A = window.analytics; if (A) { A.trackShareURLGenerate('send_wishes', 'copy'); A.trackShareURLCopy('send_wishes'); } };
       if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url).then(done, fallback); else fallback();
       function fallback() {
         var ta = document.createElement('textarea'); ta.value = url; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
@@ -279,7 +279,7 @@
     });
     bShare.addEventListener('click', function () {
       var v = values();
-      navigator.share({ title: 'Happy Diwali 2026', text: shareText(v), url: currentURL }).then(function () { track('Share Native'); }, function () {});
+      navigator.share({ title: 'Happy Diwali 2026', text: shareText(v), url: currentURL }).then(function () { var A = window.analytics; A && A.trackShareURLGenerate('send_wishes', 'native'); }, function () {});
     });
 
     var backdrop = document.getElementById('panelBackdrop');
@@ -288,6 +288,7 @@
       panel.classList.remove('hidden'); btn.setAttribute('aria-expanded', 'true');
       if (backdrop) backdrop.classList.remove('hidden');
       update();
+      window.analytics && window.analytics.trackMenuOpen('send_wishes');
       // Focus the first field (Sky message) synchronously. A deferred focus() used to land after the user
       // (or autofill / a test) had already started typing elsewhere and moved their keystrokes into "Your name".
       // Never pull focus away from a field the user is already in.
@@ -309,7 +310,6 @@
     update();
   }
 
-  function track(name) { try { if (window.plausible) window.plausible(name); } catch (e) {} }
 
   function syncReducedMotion() {
     var on = REDUCE || !!(window.performanceConfig && window.performanceConfig.reducedMotion);
@@ -321,7 +321,7 @@
     buildSharePanel();
     renderGreeting();
     if (P.active) {
-      track('Personalized Visit');
+      window.analytics && window.analytics.trackPersonalizedVisit(P.lang, !!P.msg);
       if (!IS_3D) skyBurst(1300);   // the 3D page triggers its own burst once the intro ends
     }
   }

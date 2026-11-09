@@ -915,7 +915,7 @@ window.initUI(); window.initUserInteraction(); window.loadURLConfig();
 window.initSyncControls?.(); window.initShowEditor?.();
 let first = false; const track = () => { if (!first) { first = true; window.analytics?.trackFirstInteraction(); } };
 window.canvas.addEventListener('click', track, { once: true }); window.canvas.addEventListener('touchstart', track, { once: true });
-document.getElementById('skipIntro').onclick = dissolve;
+document.getElementById('skipIntro').onclick = () => { window.analytics?.trackAsciiSkip(); dissolve(); };
 initAscii();
 if (params.get('phase') === '3d') { asciiStep(16, 3000); dissolve(); }
 else if (REDUCE) { for (let i = 0; i < 60; i++) asciiStep(50, 3000); caption.textContent = 'Reduced motion: still frame'; setTimeout(dissolve, 1500); }
