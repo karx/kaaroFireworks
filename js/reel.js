@@ -10,6 +10,7 @@
   if (!src) return;
   var REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   function el(t, c, txt) { var n = document.createElement(t); if (c) n.className = c; if (txt != null) n.textContent = txt; return n; }
+  function ib(t, c, icon, label) { var n = el(t, c); if (window.kfIcon) n.appendChild(window.kfIcon(icon)); if (label) n.appendChild(el('span', 'kf-lbl', label)); return n; }
   function track(n) { try { window.plausible && window.plausible(n); } catch (e) {} }
 
   // Modal player (sound on, user-initiated).
@@ -22,12 +23,12 @@
   v.setAttribute('aria-label', title);
   var s = document.createElement('source'); s.src = src; s.type = 'video/mp4'; v.appendChild(s);
   var actions = el('div', 'kf-reel-actions');
-  var dl = el('a', null, '⬇ Download' + (size ? ' (' + size + ')' : '')); dl.href = src; dl.setAttribute('download', src.split('/').pop());
+  var dl = ib('a', 'kf-btn', 'download', 'Download' + (size ? ' · ' + size : '')); dl.href = src; dl.setAttribute('download', src.split('/').pop());
   dl.addEventListener('click', function () { track('Reel Download'); });
-  var make = el('button', null, '💌 Send your own wishes'); make.type = 'button';
+  var make = ib('button', 'kf-btn kf-btn-accent', 'send', 'Send your own wishes'); make.type = 'button';
   make.addEventListener('click', function () { closeModal(); window.kfOpenGreetPanel && window.kfOpenGreetPanel(); });
   actions.appendChild(dl); actions.appendChild(make);
-  var x = el('button', 'kf-reel-close', '✕'); x.type = 'button'; x.setAttribute('aria-label', 'Close reel');
+  var x = ib('button', 'kf-reel-close', 'x'); x.type = 'button'; x.setAttribute('aria-label', 'Close reel');
   sheet.appendChild(x); sheet.appendChild(h); sheet.appendChild(v); sheet.appendChild(actions);
   modal.appendChild(sheet); document.body.appendChild(modal);
 
@@ -59,14 +60,15 @@
   if (loopPoster) lv.poster = loopPoster;
   if (!REDUCE) lv.autoplay = true;
   var ls = document.createElement('source'); ls.src = loop || src; ls.type = 'video/mp4'; lv.appendChild(ls);
-  card.appendChild(lv); card.appendChild(el('span', 'kf-reel-tag', '▶ ' + title));
+  var tag = ib('span', 'kf-reel-tag', 'play', title);
+  card.appendChild(lv); card.appendChild(tag);
   card.addEventListener('click', function () { openModal(card); });
   document.body.appendChild(card);
 
   // Mobile: compact pill next to the 3D CTA.
   var cta = document.getElementById('cta3d');
   if (cta) {
-    var pill = el('button', 'kf-reel-pill', '▶ Reel'); pill.type = 'button'; pill.setAttribute('aria-label', title);
+    var pill = ib('button', 'kf-reel-pill', 'play', 'Reel'); pill.type = 'button'; pill.setAttribute('aria-label', title);
     pill.addEventListener('click', function () { openModal(pill); });
     cta.insertBefore(pill, cta.firstChild);
   }

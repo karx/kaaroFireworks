@@ -230,7 +230,7 @@ function initSettingsControls() {
         if (file) {
             window.loadImageFromFile(file, (img) => {
                 currentImage = img;
-                if (uploadImageBtn) uploadImageBtn.textContent = '🎆 Launch Image';
+                if (uploadImageBtn) { const l = uploadImageBtn.querySelector('.kf-lbl'); if (l) l.textContent = 'Launch image'; else uploadImageBtn.textContent = 'Launch image'; }
                 
                 // Auto-launch the image
                 const maxWidth = parseInt(imageSize?.value || 300);
@@ -359,10 +359,15 @@ function initShareControls() {
         Object.keys(configs).forEach(name => {
             const item = document.createElement('div');
             item.className = 'saved-config-item';
-            item.innerHTML = `
-                <span class="saved-config-name">${name}</span>
-                <span class="saved-config-delete">✕</span>
-            `;
+            const nameEl = document.createElement('span');
+            nameEl.className = 'saved-config-name';
+            nameEl.textContent = name;
+            const del = document.createElement('span');
+            del.className = 'saved-config-delete';
+            del.setAttribute('role', 'button');
+            del.setAttribute('aria-label', 'Delete ' + name);
+            del.textContent = '\u00d7';
+            item.append(nameEl, del);
             
             item.querySelector('.saved-config-name').addEventListener('click', () => {
                 window.loadConfiguration(name);
@@ -419,6 +424,17 @@ function initPerformanceControls() {
 }
 
 // Auto launch
+// The button holds an inline SVG icon (<use href="#i-play|#i-stop">) plus a .kf-lbl text span.
+function setAutoLaunchLabel(btn, on) {
+    const lbl = btn.querySelector('.kf-lbl');
+    if (lbl) lbl.textContent = on ? 'Stop' : 'Auto launch';
+    else btn.textContent = on ? 'Stop auto launch' : 'Auto launch';
+    const use = btn.querySelector('use');
+    if (use) use.setAttribute('href', on ? '#i-stop' : '#i-play');
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.setAttribute('aria-label', on ? 'Stop auto launch' : 'Auto launch fireworks');
+}
+
 function initAutoLaunch() {
     const autoLaunchBtn = document.getElementById('autoLaunch');
     
@@ -427,7 +443,7 @@ function initAutoLaunch() {
             clearInterval(autoLaunchInterval);
             autoLaunchInterval = null;
             autoLaunchBtn.classList.remove('active');
-            autoLaunchBtn.textContent = 'Auto Launch';
+            setAutoLaunchLabel(autoLaunchBtn, false);
         } else {
             autoLaunchInterval = setInterval(() => {
                 const x = Math.random() * window.canvas.width;
@@ -435,7 +451,7 @@ function initAutoLaunch() {
                 window.launchFirework(x, y);
             }, 800);
             autoLaunchBtn.classList.add('active');
-            autoLaunchBtn.textContent = 'Stop Auto Launch';
+            setAutoLaunchLabel(autoLaunchBtn, true);
         }
     });
 }
