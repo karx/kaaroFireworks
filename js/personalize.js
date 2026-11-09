@@ -3,13 +3,17 @@
 //   from = sender name(s)          e.g. from=Kartik
 //   to   = co-sender ("& Arshi")   e.g. from=Kartik&to=Arshi -> "Happy Diwali from Kartik & Arshi"
 //   for  = recipient               e.g. for=Nani -> "Dear Nani,"
-//   msg  = short personal line     (max 120 characters)
+//   msg  = the text that lights up the sky as a firework burst (and the overlay quote).
+//          Fireworks text is capped at SKY_MAX graphemes for legibility; longer messages still show in full
+//          (up to 120) in the greeting overlay. With no msg the sky says "Happy Diwali" / "शुभ दीपावली".
+//          Sender names are NEVER drawn in the fireworks, only in the overlay.
 //   lang = en | hi                 (greeting language)
 // Everything is rendered with textContent, never innerHTML. Unicode-safe (Hindi names work).
 (function () {
   'use strict';
 
   var LIMITS = { from: 40, to: 40, for: 40, msg: 120 };
+  var SKY_MAX = 28;   // graphemes that stay legible as particle text on a 390px-wide phone
   var STORE_FROM = 'kf-greet-from', STORE_TO = 'kf-greet-to';
   var REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var IS_3D = /ascii-to-3d/.test(location.pathname);
@@ -39,8 +43,8 @@
     lang: q.get('lang') === 'hi' ? 'hi' : 'en'
   };
   var T = {
-    en: { happy: 'Happy Diwali', from: 'from', dear: 'Dear', amp: '&', wish: 'Shubh Deepavali 2026 🪔' },
-    hi: { happy: 'दिवाली की शुभकामनाएँ', from: '', dear: 'प्रिय', amp: 'और', wish: 'शुभ दीपावली 2026 🪔' }
+    en: { happy: 'Happy Diwali', from: 'from', dear: 'Dear', amp: '&', wish: 'Shubh Deepavali 2026', sky: 'Happy Diwali' },
+    hi: { happy: 'दिवाली की शुभकामनाएँ', from: '', dear: 'प्रिय', amp: 'और', wish: 'शुभ दीपावली 2026', sky: 'शुभ दीपावली' }
   };
   function senders(p, lang) {
     var t = T[lang || 'en'];
@@ -49,17 +53,37 @@
   }
   function sentence(p) {
     var t = T[p.lang], who = senders(p, p.lang);
-    if (!who) return '';
+    if (!who) return t.happy;
     return p.lang === 'hi' ? who + ' की ओर से ' + t.happy : t.happy + ' ' + t.from + ' ' + who;
   }
   P.senders = senders(P, P.lang);
   P.greeting = sentence(P);
-  P.burstText = senders(P, 'en') ? (P.from && P.to ? P.from + ' & ' + P.to : P.senders) : '';
-  P.active = !!P.senders;
+  // Text for the fireworks: the message, or a festive default. Never the sender's name.
+  function skyText(msg, lang) {
+    var m = clean(msg, LIMITS.msg).replace(/…$/, '');
+    if (!m) return T[lang || 'en'].sky;
+    var g = graphemes(m);
+    if (g.length <= SKY_MAX) return m;
+    var cut = g.slice(0, SKY_MAX).join('');
+    var sp = cut.lastIndexOf(' ');
+    return (sp >= 10 ? cut.slice(0, sp) : cut).trim();
+  }
+  P.skyText = skyText(P.msg, P.lang);
+  P.burstText = P.skyText;           // back-compat alias
+  P.active = !!(P.senders || P.msg);
+  P.SKY_MAX = SKY_MAX;
   window.KF_PERSONAL = P;
 
   /* ---------- greeting overlay + title ---------- */
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  // Inline SVG icon from the page sprite (#i-*). No icon font, no runtime dependency.
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function icon(name) {
+    var svg = document.createElementNS(SVGNS, 'svg'); svg.setAttribute('class', 'kf-i'); svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('focusable', 'false');
+    var use = document.createElementNS(SVGNS, 'use'); use.setAttribute('href', '#i-' + name); svg.appendChild(use); return svg;
+  }
+  function iconBtn(tag, cls, name, label) { var b = el(tag, cls); b.appendChild(icon(name)); if (label) b.appendChild(el('span', 'kf-lbl', label)); return b; }
+  window.kfIcon = icon;
 
   function renderGreeting() {
     if (!P.active) return;
@@ -69,9 +93,11 @@
     box.setAttribute('role', 'status');
     if (P.for) box.appendChild(el('p', 'kf-greeting-dear', T[P.lang].dear + ' ' + P.for + ','));
     box.appendChild(el('p', 'kf-greeting-happy', T[P.lang].happy));
-    var who = el('p', 'kf-greeting-from');
-    who.textContent = P.lang === 'hi' ? P.senders + ' की ओर से' : 'from ' + P.senders;
-    box.appendChild(who);
+    if (P.senders) {
+      var who = el('p', 'kf-greeting-from');
+      who.textContent = P.lang === 'hi' ? P.senders + ' की ओर से' : 'from ' + P.senders;
+      box.appendChild(who);
+    }
     if (P.msg) box.appendChild(el('p', 'kf-greeting-msg', '“' + P.msg + '”'));
     box.appendChild(el('p', 'kf-greeting-wish', T[P.lang].wish));
     document.body.appendChild(box);
@@ -79,10 +105,10 @@
     setTimeout(function () { box.classList.add('kf-greeting-dim'); }, REDUCE ? 4000 : 9000);
   }
 
-  // Spell the names in fireworks (classic particles; the 3D page renders the same particles in 3D).
-  function nameBurst(delay) {
+  // Light up the sky with the message (classic particles; the 3D page renders the same particles in 3D).
+  function skyBurst(delay) {
     if (!P.active || !window.launchTextFirework || !window.canvas) return;
-    var text = P.burstText;
+    var text = P.skyText;
     var g = graphemes(text).length;
     setTimeout(function () {
       // read the canvas size at fire time (it is still 300x150 before the first resize)
@@ -91,11 +117,43 @@
       var mctx = document.createElement('canvas').getContext('2d');
       mctx.font = 'bold 100px Arial';
       var w100 = mctx.measureText(text).width || (g * 60);
-      var size = Math.max(24, Math.min(130, Math.floor(100 * (W * 0.88) / w100)));
-      window.launchTextFirework(text, W / 2, H * (IS_3D ? 0.5 : 0.52), { fontSize: size, color: '#ffcf6b', spread: 0.6 });
+      var fit = (!IS_3D && W >= 900) ? 0.72 : 0.88;   // keep clear of the desktop reel card
+      var size = Math.max(24, Math.min(130, Math.floor(100 * (W * fit) / w100)));
+      launchSky(text, W / 2, H * (IS_3D ? 0.5 : 0.52), { fontSize: size, color: '#ffcf6b', spread: 0.6 });
     }, delay);
   }
-  window.kfNameBurst = nameBurst;
+  // 2D page: text particles spawn staggered over ~2s and fade in ~1s by default, so the message never reads at once.
+  // Slow their fade and gravity for the length of the sky burst (the 3D module does the same for its renderer).
+  var skyUntil = 0;
+  if (!IS_3D && window.Particle && window.Particle.prototype.init) {
+    var baseInit = window.Particle.prototype.init;
+    window.Particle.prototype.init = function (x, y, color, vx, vy, o) {
+      baseInit.apply(this, arguments);
+      if (Date.now() < skyUntil && o && o.trail === false && o.colorTransition === false) {
+        this.decay = 0.006 + Math.random() * 0.003;
+        this.customGravity = (window.config ? window.config.gravity : 0.1) * 0.05;
+        this.size = 1.1 + Math.random() * 0.9;   // finer dots keep small / Devanagari glyphs readable
+      }
+    };
+  }
+  var launchSky = function (text, x, y, opts) {
+    skyUntil = Date.now() + 6000;   // covers rocket flight + staggered spawn
+    // Fly the rocket straight up under the target so the message is centred
+    // (launchTextFirework starts from a random x and bursts off-centre).
+    var FW = typeof Firework === 'function' ? Firework : null;   // classic global from fireworks.js
+    if (!FW || !window.fireworks || !window.createTextExplosion) { window.launchTextFirework(text, x, y, opts); return; }
+    var fw = new FW(x, window.canvas.height, x, y);
+    window.fireworks.push(fw);
+    var iv = setInterval(function () {
+      if (fw.distanceTraveled >= fw.distanceToTarget * 0.9) {
+        clearInterval(iv);
+        var i = window.fireworks.indexOf(fw); if (i > -1) window.fireworks.splice(i, 1);
+        window.createTextExplosion(text, x, fw.y, opts);
+      }
+    }, 16);
+  };
+  window.kfSkyBurst = skyBurst;
+  window.kfNameBurst = skyBurst;   // old name, kept for callers
 
   /* ---------- share panel ---------- */
   function buildURL(v) {
@@ -127,11 +185,10 @@
   function buildSharePanel() {
     var controls = document.querySelector('.controls');
     if (!controls) return;
-    var btn = el('button', 'btn-primary kf-greet-btn');
+    var btn = iconBtn('button', 'btn-primary kf-btn kf-btn-accent kf-greet-btn', 'send', 'Send wishes');
     btn.type = 'button'; btn.id = 'greetToggle';
     btn.setAttribute('aria-haspopup', 'dialog'); btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'greetPanel');
     btn.setAttribute('aria-label', 'Send a personalised Diwali link');
-    btn.appendChild(el('span', 'kf-greet-ico', '💌')); btn.appendChild(el('span', 'kf-greet-lbl', 'Send wishes'));
     controls.insertBefore(btn, controls.children[1] || null);
 
     var panel = el('div', 'settings-panel kf-greet-panel hidden');
@@ -139,19 +196,23 @@
     panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'false'); panel.setAttribute('aria-labelledby', 'greetTitle');
     var head = el('div', 'panel-header');
     var h = el('h3', null, 'Send a Diwali link'); h.id = 'greetTitle';
-    var close = el('button', 'panel-close', '✕'); close.type = 'button'; close.setAttribute('aria-label', 'Close');
+    var close = iconBtn('button', 'panel-close', 'x'); close.type = 'button'; close.setAttribute('aria-label', 'Close');
     head.appendChild(h); head.appendChild(close); panel.appendChild(head);
 
     var body = el('div', 'kf-greet-body');
     var fFrom = field('greetFrom', 'Your name', { placeholder: 'e.g. Kartik or कार्तिक', max: LIMITS.from, autocomplete: 'given-name' });
     var fTo = field('greetTo', 'With (optional)', { placeholder: 'e.g. Arshi', max: LIMITS.to, hint: 'Shows as “Happy Diwali from Kartik & Arshi”.' });
     var fFor = field('greetFor', 'For (optional)', { placeholder: 'e.g. Nani', max: LIMITS.for });
-    var fMsg = field('greetMsg', 'Message (optional)', { placeholder: 'Roshni aur mithaas bhari ho!', max: LIMITS.msg });
+    var fMsg = field('greetMsg', 'Sky message', { placeholder: 'Roshni Mubarak', max: SKY_MAX * 4, autocomplete: 'off',
+      hint: 'This is the text that lights up the sky as fireworks. Leave empty for “Happy Diwali”.' });
+    fMsg.wrap.classList.add('kf-field-sky');
+    var count = el('span', 'kf-count'); count.id = 'greetMsgCount'; count.setAttribute('aria-live', 'polite');
+    fMsg.wrap.querySelector('label').appendChild(count);
     var row = el('div', 'kf-row');
     var fLang = field('greetLang', 'Language', { tag: 'select', options: [['en', 'English'], ['hi', 'हिंदी']] });
     var fPage = field('greetPage', 'Open as', { tag: 'select', options: [['3d', '3D show'], ['2d', 'Classic']] });
     row.appendChild(fLang.wrap); row.appendChild(fPage.wrap);
-    [fFrom, fTo, fFor, fMsg].forEach(function (f) { body.appendChild(f.wrap); });
+    [fMsg, fFrom, fTo, fFor].forEach(function (f) { body.appendChild(f.wrap); });
     body.appendChild(row);
 
     var prevLabel = el('label', null, 'Your link'); prevLabel.htmlFor = 'greetURL';
@@ -160,9 +221,9 @@
     body.appendChild(prevWrap);
 
     var actions = el('div', 'kf-actions');
-    var bCopy = el('button', 'action-btn kf-copy', '🔗 Copy link'); bCopy.type = 'button';
-    var bShare = el('button', 'action-btn kf-native', '📲 Share…'); bShare.type = 'button';
-    var bWa = el('a', 'action-btn kf-wa', '🟢 WhatsApp'); bWa.target = '_blank'; bWa.rel = 'noopener noreferrer';
+    var bCopy = iconBtn('button', 'action-btn kf-copy', 'link', 'Copy link'); bCopy.type = 'button';
+    var bShare = iconBtn('button', 'action-btn kf-native', 'share', 'Share'); bShare.type = 'button';
+    var bWa = iconBtn('a', 'action-btn kf-wa', 'chat', 'WhatsApp'); bWa.target = '_blank'; bWa.rel = 'noopener noreferrer';
     actions.appendChild(bCopy); if (navigator.share) actions.appendChild(bShare); actions.appendChild(bWa);
     body.appendChild(actions);
     var status = el('p', 'kf-status'); status.setAttribute('role', 'status'); body.appendChild(status);
@@ -172,6 +233,7 @@
     fFrom.input.value = P.from || load(STORE_FROM);
     fTo.input.value = P.from ? P.to : (P.to || load(STORE_TO));
     fLang.input.value = P.lang;
+    if (P.msg) fMsg.input.value = skyText(P.msg, P.lang);
     fPage.input.value = '3d';
 
     var currentURL = '';
@@ -186,6 +248,15 @@
       var shown = url; try { shown = decodeURI(url); } catch (e) {}
       prev.textContent = shown;   // readable (Hindi stays Hindi); copy/share use the encoded URL
       bWa.href = 'https://wa.me/?text=' + encodeURIComponent(shareText(v) + ' ' + url);
+      // cap by grapheme (maxLength counts UTF-16 units, which would cut Devanagari short)
+      var gm = graphemes(fMsg.input.value);
+      if (gm.length > SKY_MAX) { fMsg.input.value = gm.slice(0, SKY_MAX).join(''); v.msg = fMsg.input.value; }
+      var n = graphemes(clean(v.msg, LIMITS.msg)).length;
+      count.textContent = n + '/' + SKY_MAX;
+      count.classList.toggle('is-near', n >= SKY_MAX - 4);
+      fMsg.input.placeholder = v.lang === 'hi' ? 'रोशनी मुबारक' : 'Roshni Mubarak';
+      var hint = document.getElementById('greetMsgHint');
+      if (hint) hint.textContent = 'This is the text that lights up the sky as fireworks. Leave empty for “' + T[v.lang === 'hi' ? 'hi' : 'en'].sky + '”.';
       var ok = !!clean(v.from, 40);
       bCopy.disabled = !ok; bShare.disabled = !ok;
       bWa.setAttribute('aria-disabled', ok ? 'false' : 'true'); bWa.classList.toggle('is-disabled', !ok);
@@ -197,7 +268,7 @@
 
     bCopy.addEventListener('click', function () {
       var url = currentURL;
-      var done = function () { status.textContent = 'Link copied. Paste it anywhere ✨'; track('Share Copy'); };
+      var done = function () { status.textContent = 'Link copied. Paste it anywhere.'; track('Share Copy'); };
       if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url).then(done, fallback); else fallback();
       function fallback() {
         var ta = document.createElement('textarea'); ta.value = url; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
@@ -244,7 +315,7 @@
     renderGreeting();
     if (P.active) {
       track('Personalized Visit');
-      if (!IS_3D) nameBurst(1300);   // the 3D page triggers its own burst once the intro ends
+      if (!IS_3D) skyBurst(1300);   // the 3D page triggers its own burst once the intro ends
     }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

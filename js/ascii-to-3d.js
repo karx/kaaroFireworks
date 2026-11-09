@@ -739,13 +739,14 @@ function stepFx(dt) {
 /* ---------------- ASCII intro ---------------- */
 const pre = document.getElementById('ascii'), caption = document.getElementById('caption');
 const KP = window.KF_PERSONAL || {};
+// The ASCII sky spells the sender's message (or the festive default), never the sender's name.
 const PERSONAL_LINE = (() => {
-  if (!KP.active) return [];
-  const line = KP.lang === 'hi' ? `${KP.senders} की ओर से` : `from ${KP.senders}`;
+  if (!KP.active || !KP.skyText) return [];
+  const line = KP.skyText;
   const seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null;
   return (seg ? Array.from(seg.segment(line), x => x.segment) : [...line]).slice(0, 60);
 })();
-if (KP.active) caption.textContent = KP.lang === 'hi' ? `${KP.senders} की ओर से ASCII पटाखे…` : `ASCII patakas from ${KP.senders}…`;
+if (KP.active && KP.senders) caption.textContent = KP.lang === 'hi' ? `${KP.senders} की ओर से ASCII पटाखे…` : `ASCII patakas from ${KP.senders}…`;
 let COLS, ROWS, grid, ents, introT0, introRaf, phase = 'ascii';
 const DIYA = ['  (  ', ' _)_ ', '\\___/'];
 function asciiSize() {
@@ -820,7 +821,7 @@ function enterShow() {
   if (phase === 'show') return; phase = 'show';
   document.body.classList.remove('intro'); pre.remove();
   setTimeout(() => window.launchFirework(window.canvas.width / 2, window.canvas.height / 3), 500);
-  if (KP.active) window.kfNameBurst?.(1700);   // names burst in 3D particles
+  if (KP.active) (window.kfSkyBurst || window.kfNameBurst)?.(1700);   // message burst in 3D particles
 }
 
 function mirrorTo2D() {
