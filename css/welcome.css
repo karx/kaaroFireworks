@@ -1,0 +1,19 @@
+/* First-visit welcome on / (RFC R-UX-1). Sharp, UI 2026 tokens from hud.css. */
+.kf-welcome{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:8;pointer-events:none;
+  width:min(92vw,560px);padding:28px 24px;text-align:center;color:var(--kf-text,#fbf5ea);font-family:var(--kf-font,system-ui,sans-serif);
+  background:radial-gradient(closest-side,rgba(10,8,6,.72),rgba(10,8,6,0));transition:opacity .4s ease;animation:kf-welcome-in .8s cubic-bezier(.2,.7,.2,1) both}
+.kf-welcome p,.kf-welcome h2{margin:0;text-shadow:0 2px 12px rgba(0,0,0,.9)}
+.kf-welcome-eyebrow{font:600 12px/1 var(--kf-font,system-ui,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--kf-accent,#ffb53d)}
+.kf-welcome-title{margin-top:12px!important;font:700 clamp(26px,6.4vw,40px)/1.15 var(--kf-font,system-ui,sans-serif);letter-spacing:-.01em}
+.kf-welcome-hint{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:20px!important;
+  font:600 16px/1.3 var(--kf-font,system-ui,sans-serif);color:var(--kf-gold-soft,#ffe2a6);animation:kf-welcome-pulse 2.4s ease-in-out infinite}
+.kf-welcome-ico{width:20px;height:20px;flex:0 0 auto;fill:none;stroke:var(--kf-accent,#ffb53d);stroke-width:1.75;stroke-linecap:square}
+.kf-welcome-link{pointer-events:auto;display:inline-flex;align-items:center;min-height:44px;margin-top:8px;padding:0 8px;
+  font:500 14px/1 var(--kf-font,system-ui,sans-serif);color:var(--kf-text-2,rgba(251,245,234,.72));text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--kf-accent-line,rgba(255,181,61,.55))}
+.kf-welcome-link:hover{color:var(--kf-text,#fbf5ea)}
+.kf-welcome-link:focus-visible{outline:2px solid var(--kf-accent,#ffb53d);outline-offset:2px}
+.kf-welcome-inline{display:flex;margin-top:16px!important;font-size:15px}
+.kf-welcome-out{opacity:0!important;transition:opacity .4s ease}
+@keyframes kf-welcome-in{from{opacity:0}to{opacity:1}}
+@keyframes kf-welcome-pulse{0%,100%{opacity:1}50%{opacity:.55}}
+@media (prefers-reduced-motion: reduce){.kf-welcome,.kf-welcome-hint{animation:none}}

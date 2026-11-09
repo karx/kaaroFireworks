@@ -11,7 +11,7 @@
   var REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   function el(t, c, txt) { var n = document.createElement(t); if (c) n.className = c; if (txt != null) n.textContent = txt; return n; }
   function ib(t, c, icon, label) { var n = el(t, c); if (window.kfIcon) n.appendChild(window.kfIcon(icon)); if (label) n.appendChild(el('span', 'kf-lbl', label)); return n; }
-  function track(n) { try { window.plausible && window.plausible(n); } catch (e) {} }
+  function track(action, from) { try { window.analytics && window.analytics.trackReel(action, from); } catch (e) {} }
 
   // Modal player (sound on, user-initiated).
   var modal = el('div', 'kf-reel-modal'); modal.hidden = true;
@@ -24,9 +24,9 @@
   var s = document.createElement('source'); s.src = src; s.type = 'video/mp4'; v.appendChild(s);
   var actions = el('div', 'kf-reel-actions');
   var dl = ib('a', 'kf-btn', 'download', 'Download' + (size ? ' · ' + size : '')); dl.href = src; dl.setAttribute('download', src.split('/').pop());
-  dl.addEventListener('click', function () { track('Reel Download'); });
+  dl.addEventListener('click', function () { track('download'); });
   var make = ib('button', 'kf-btn kf-btn-accent', 'send', 'Send your own wishes'); make.type = 'button';
-  make.addEventListener('click', function () { closeModal(); window.kfOpenGreetPanel && window.kfOpenGreetPanel(); });
+  make.addEventListener('click', function () { track('send_wishes'); closeModal(); window.kfOpenGreetPanel && window.kfOpenGreetPanel(); });
   actions.appendChild(dl); actions.appendChild(make);
   var x = ib('button', 'kf-reel-close', 'x'); x.type = 'button'; x.setAttribute('aria-label', 'Close reel');
   sheet.appendChild(x); sheet.appendChild(h); sheet.appendChild(v); sheet.appendChild(actions);
@@ -34,7 +34,7 @@
 
   var opener = null;
   function openModal(from) {
-    opener = from || document.activeElement; modal.hidden = false; track('Reel Open');
+    opener = from || document.activeElement; modal.hidden = false; track('open', from && from.classList && from.classList.contains('kf-reel-pill') ? 'pill' : 'card');
     var p = v.play(); if (p && p.catch) p.catch(function () {});
     x.focus();
   }

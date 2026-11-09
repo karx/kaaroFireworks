@@ -1,13 +1,29 @@
 // Analytics module for Kaaro Fireworks
 // Privacy-friendly event tracking using Plausible Analytics
 
+// Works with the Plausible pa-*.js snippet: the inline stub in <head> defines window.plausible (a queue)
+// before this file runs, so events are queued and sent once the async script loads.
+// Every custom event carries a `page` prop: home | ascii | about | not_found (from <body data-page>).
+
+function currentPage() {
+    const fromBody = document.body && document.body.dataset && document.body.dataset.page;
+    if (fromBody) return fromBody;
+    const path = (window.location && window.location.pathname) || '/';
+    if (/ascii-to-3d/.test(path)) return 'ascii';
+    if (/about/.test(path)) return 'about';
+    return 'home';
+}
+
+const FIREWORK_EVENT_INTERVAL_MS = 5000;   // send firework_launch at most once per 5 s
+
 const analytics = {
     initialized: false,
     debug: false, // Set to true for console logging
+    _fw: { lastSent: 0, pending: 0, props: null, timer: null },
     
     init() {
-        // Check if Plausible is loaded
-        this.initialized = typeof window.plausible !== 'undefined';
+        // Check if Plausible (or its queue stub) is present
+        this.initialized = typeof window.plausible === 'function';
         
         if (!this.initialized) {
             console.warn('Analytics not loaded - tracking disabled');
@@ -20,13 +36,14 @@ const analytics = {
     },
     
     track(eventName, props = {}) {
+        if (!this.initialized && typeof window.plausible === 'function') this.initialized = true;   // stub defined late
         if (!this.initialized) {
             if (this.debug) console.log('Analytics track (disabled):', eventName, props);
             return;
         }
         
         try {
-            window.plausible(eventName, { props });
+            window.plausible(eventName, { props: Object.assign({ page: currentPage() }, props) });
             if (this.debug) console.log('Analytics track:', eventName, props);
         } catch (error) {
             console.error('Analytics tracking error:', error);
@@ -34,11 +51,25 @@ const analytics = {
     },
     
     // Firework Events
+    // Rate-limited: the first launch is sent at once, later ones are batched into one event per 5 s
+    // with `count` = launches it represents (so heavy tapping doesn't burn the event quota).
     trackFireworkLaunch(explosionType, isMobile) {
-        this.track('firework_launch', { 
-            explosion_type: explosionType || 'random',
-            is_mobile: isMobile ? 'yes' : 'no'
-        });
+        const fw = this._fw;
+        fw.pending += 1;
+        fw.props = { explosion_type: explosionType || 'random', is_mobile: isMobile ? 'yes' : 'no' };
+        const now = Date.now();
+        const wait = fw.lastSent + FIREWORK_EVENT_INTERVAL_MS - now;
+        if (wait <= 0) { this._flushFireworks(); return; }
+        if (!fw.timer) fw.timer = setTimeout(() => this._flushFireworks(), wait);
+    },
+    
+    _flushFireworks() {
+        const fw = this._fw;
+        if (fw.timer) { clearTimeout(fw.timer); fw.timer = null; }
+        if (!fw.pending) return;
+        this.track('firework_launch', Object.assign({}, fw.props, { count: fw.pending }));
+        fw.pending = 0;
+        fw.lastSent = Date.now();
     },
     
     trackAutoShowStart() {
@@ -109,12 +140,36 @@ const analytics = {
         });
     },
     
-    trackShareURLGenerate() {
-        this.track('share_url_generate');
+    // source: settings (classic Share & Save panel) | send_wishes (personalised link panel)
+    // method: copy | whatsapp | native
+    trackShareURLGenerate(source = 'settings', method = 'copy') {
+        this.track('share_url_generate', { source, method });
     },
     
-    trackShareURLCopy() {
-        this.track('share_url_copy');
+    trackShareURLCopy(source = 'settings') {
+        this.track('share_url_copy', { source });
+    },
+    
+    // Personalised links and the Diwali reel (PRs #4/#5)
+    trackPersonalizedVisit(lang, hasMsg) {
+        this.track('personalized_visit', { lang: lang || 'en', has_msg: hasMsg ? 'yes' : 'no' });
+    },
+    
+    trackReel(action, from) {
+        // action: open | download | send_wishes
+        this.track('reel_' + action, from ? { from } : {});
+    },
+    
+    trackReelLinkClick(placement) {
+        this.track('reel_link_click', { placement: placement || 'footer' });
+    },
+    
+    trackAsciiSkip() {
+        this.track('ascii_skip_to_3d');
+    },
+    
+    trackCTA3D() {
+        this.track('cta_3d_click');
     },
     
     trackQRCodeGenerate() {
@@ -217,9 +272,11 @@ if (typeof window !== 'undefined') {
         analytics.init();
     }
     
-    // Track session duration on page unload
+    // Track session duration on page unload; flush any batched firework_launch count first
     let sessionStart = Date.now();
+    window.addEventListener('pagehide', () => analytics._flushFireworks());
     window.addEventListener('beforeunload', () => {
+        analytics._flushFireworks();
         const duration = Math.floor((Date.now() - sessionStart) / 1000);
         analytics.trackSessionDuration(duration);
     });
