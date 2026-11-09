@@ -287,7 +287,14 @@
       document.querySelectorAll('.settings-panel:not(.hidden)').forEach(function (p) { if (p !== panel) p.classList.add('hidden'); });
       panel.classList.remove('hidden'); btn.setAttribute('aria-expanded', 'true');
       if (backdrop) backdrop.classList.remove('hidden');
-      update(); setTimeout(function () { fFrom.input.focus(); }, 30);
+      update();
+      // Focus the first field (Sky message) synchronously. A deferred focus() used to land after the user
+      // (or autofill / a test) had already started typing elsewhere and moved their keystrokes into "Your name".
+      // Never pull focus away from a field the user is already in.
+      if (!panel.contains(document.activeElement)) {
+        try { fMsg.input.focus({ preventScroll: true }); } catch (e) { fMsg.input.focus(); }
+        var n = fMsg.input.value.length; try { fMsg.input.setSelectionRange(n, n); } catch (e) {}
+      }
     }
     function shut(returnFocus) {
       panel.classList.add('hidden'); btn.setAttribute('aria-expanded', 'false');

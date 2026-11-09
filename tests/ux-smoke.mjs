@@ -49,19 +49,26 @@ await page('xss', '/?from=' + E('<img src=x onerror=alert(1)>Eve') + '&to=' + E(
   return { nodes: await p.evaluate(() => document.querySelectorAll('.kf-greeting img, .kf-greeting script, .kf-greeting b').length),
            msg: await p.evaluate(() => window.KF_PERSONAL.msg), text: await p.evaluate(() => document.querySelector('.kf-greeting')?.innerText) };
 });
-await page('share-desktop', '/', D, false, async p => {
+// Share panel: open it, check autofocus lands on Sky message, then fill every field by its own selector
+// and read the values back (fails loudly if typing ever lands in the wrong field).
+async function sharePanel(p, name) {
   await p.evaluate(() => localStorage.clear());
-  await p.click('#greetToggle'); await p.fill('#greetFrom', 'Kartik'); await p.fill('#greetTo', 'Arshi');
-  if (await p.$('#greetMsg')) await p.fill('#greetMsg', 'Roshni Mubarak');
-  await p.waitForTimeout(300); await shot(p, '06-share-panel-desktop');
-  return { url: await p.textContent('#greetURL'), counter: await p.evaluate(() => document.querySelector('#greetMsgCount')?.textContent || null) };
-});
-await page('share-mobile', '/', M, true, async p => {
-  await p.click('#greetToggle'); await p.fill('#greetFrom', 'कार्तिक'); await p.selectOption('#greetLang', 'hi');
-  if (await p.$('#greetMsg')) await p.fill('#greetMsg', 'रोशनी मुबारक');
-  await p.waitForTimeout(300); await shot(p, '07-share-panel-mobile');
-  return { url: await p.textContent('#greetURL') };
-});
+  await p.click('#greetToggle');
+  await p.waitForSelector('#greetPanel:not(.hidden)');
+  const focusedOnOpen = await p.evaluate(() => document.activeElement && document.activeElement.id);
+  await p.keyboard.type('Roshni');                      // a user typing straight away goes into the focused field
+  const typedInto = await p.evaluate(() => ({ msg: document.querySelector('#greetMsg').value, from: document.querySelector('#greetFrom').value }));
+  const want = { '#greetMsg': 'Roshni Mubarak', '#greetFrom': 'Kartik', '#greetTo': 'Arshi' };
+  for (const [sel, val] of Object.entries(want)) await p.locator(sel).fill(val);
+  await p.locator('#greetMsg').focus();
+  await p.waitForTimeout(300);
+  const got = await p.evaluate(() => ({ '#greetMsg': document.querySelector('#greetMsg').value, '#greetFrom': document.querySelector('#greetFrom').value, '#greetTo': document.querySelector('#greetTo').value }));
+  const ok = focusedOnOpen === 'greetMsg' && typedInto.msg === 'Roshni' && typedInto.from === '' && Object.keys(want).every(k => got[k] === want[k]);
+  await shot(p, name);
+  return { ok, focusedOnOpen, typedInto, got, url: await p.textContent('#greetURL'), counter: await p.textContent('#greetMsgCount') };
+}
+await page('share-desktop', '/', D, false, p => sharePanel(p, '06-share-panel-desktop'));
+await page('share-mobile', '/', M, true, p => sharePanel(p, '07-share-panel-mobile'));
 await page('reel-desktop', '/', D, false, async p => {
   await p.waitForTimeout(1500); await shot(p, '08-landing-desktop-plain');
   await p.evaluate(() => document.querySelector('.kf-reel-card').click()); await p.waitForTimeout(2000); await shot(p, '09-reel-modal-desktop');
