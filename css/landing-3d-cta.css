@@ -1,0 +1,29 @@
+/* Diwali 2026 landing banner: one sharp 48px bar (uses the tokens from hud.css). */
+.cta-3d{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9;
+  display:flex;align-items:stretch;gap:0;width:max-content;max-width:calc(100vw - 24px);
+  background:var(--kf-surface-strong,rgba(11,9,7,.95));border:1px solid var(--kf-line,rgba(255,232,196,.14));box-shadow:var(--kf-shadow,0 12px 32px rgba(0,0,0,.45))}
+.cta-3d.hidden{display:none}
+.cta-3d a{display:flex;align-items:center;gap:var(--kf-s3,12px);min-height:var(--kf-hud,48px);padding:0 var(--kf-s4,16px) 0 0;box-sizing:border-box;
+  text-decoration:none;color:var(--kf-text,#fbf5ea);font:600 15px/1.2 var(--kf-font,system-ui,sans-serif);transition:background-color .15s ease}
+.cta-3d a:hover{background:var(--kf-surface-hover,rgba(30,23,18,.92))}
+.cta-3d .cta-new{align-self:stretch;display:flex;align-items:center;padding:0 var(--kf-s3,12px);
+  font:800 11px/1 var(--kf-font,system-ui,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--kf-accent-ink,#1b1004);background:var(--kf-accent,#ffb53d)}
+.cta-3d .cta-ico{width:18px;height:18px;color:var(--kf-accent,#ffb53d)}
+.cta-3d .cta-arrow{display:flex;color:var(--kf-accent,#ffb53d)}
+.cta-3d .cta-arrow .kf-i{width:18px;height:18px}
+.cta-3d a span{white-space:nowrap}
+.cta-3d .cta-short{display:none}
+.cta-3d > button{flex:0 0 auto;width:var(--kf-hud,48px);height:auto;min-height:var(--kf-hud,48px);padding:0;margin:0;display:grid;place-items:center;cursor:pointer;
+  color:var(--kf-text-2,rgba(251,245,234,.72));background:transparent;border:0;border-left:1px solid var(--kf-line,rgba(255,232,196,.14));box-shadow:none;backdrop-filter:none}
+.cta-3d > button:hover{color:var(--kf-text,#fbf5ea);background:var(--kf-field-hover,rgba(255,255,255,.08))}
+.cta-3d > button .kf-i{width:18px;height:18px}
+.cta-3d > .kf-reel-pill{width:auto;padding:0 var(--kf-s4,16px);gap:var(--kf-s2,8px);align-items:center;border-left:0;border-right:1px solid var(--kf-line,rgba(255,232,196,.14));
+  font:700 13px/1 var(--kf-font,system-ui,sans-serif);letter-spacing:.08em;text-transform:uppercase;color:var(--kf-text,#fbf5ea)}
+.cta-3d > .kf-reel-pill .kf-i{width:14px;height:14px;color:var(--kf-accent,#ffb53d);fill:var(--kf-accent,#ffb53d)}
+@media (max-width:560px){
+  .cta-3d{left:8px;right:8px;transform:none;width:auto;max-width:none}
+  .cta-3d a{flex:1 1 auto;min-width:0;padding-left:var(--kf-s4,16px)}
+  .cta-3d .cta-new,.cta-3d .cta-long,.cta-3d .cta-ico{display:none}
+  .cta-3d .cta-short{display:inline}
+  .cta-3d a .cta-arrow{margin-left:auto}
+}

@@ -312,3 +312,23 @@ Getting started with Web Audio API | Articles - web.dev, accessed on October 20,
 - Rendering: WebGL2, HDR, ACES tone mapping, UnrealBloom, film grain and vignette. The ground is wet tiles with a planar reflection, and a Poly Haven CC0 night HDRI provides PBR reflections. The scene includes a moon, twinkling stars, a 3D city skyline, PBR clay diyas with flickering lights, an anar fountain, a spinning chakri, rocket models, smoke sprites, and dynamic point lights for each burst.
 - The page adapts its pixel ratio and drops the reflection on slow GPUs. Mobile gets particle and light caps. With `prefers-reduced-motion`, the intro is a still frame with a short fade and no camera sway.
 - `?phase=3d` skips the intro, and `?hold` freezes it. three.js r160 is vendored in `vendor/three` (MIT).
+
+## Personalised Diwali links
+
+Both pages read optional URL params. The **message lights up the sky**: it is the text the fireworks spell (a particle burst on `/`, a particle burst plus the ASCII intro line on `/ascii-to-3d.html`). Sender names appear only in the greeting overlay and the page title. They are never drawn in the fireworks.
+
+| Param | Meaning | Example |
+|---|---|---|
+| `msg` | Sky message: the text the fireworks spell. Best at 28 characters or fewer (the share panel caps it there). Longer messages (up to 120) still show in full in the overlay, and the sky gets the first words. With no `msg`, the sky says **Happy Diwali** (or **शुभ दीपावली** with `lang=hi`) | `msg=Roshni%20Mubarak` |
+| `from` | Sender, shown as "from Kartik" in the overlay | `from=Kartik` |
+| `to` | Co-sender, joined with "&" | `to=Arshi` → "from Kartik & Arshi" |
+| `for` | Recipient | `for=Nani` → "Dear Nani," |
+| `lang` | `hi` for Hindi copy | `lang=hi` → "दिवाली की शुभकामनाएँ" |
+
+Example: <https://pattaka.netlify.app/ascii-to-3d.html?from=Kartik&to=Arshi&msg=Roshni%20Mubarak>
+
+Use **Send wishes** in the HUD to build a link. The first field, **Sky message**, is the text that lights up the sky, with a live 28-character counter that counts by grapheme, so Hindi isn't cut short. Then come your name, an optional co-sender and recipient, language and 2D/3D, plus Copy / Share / WhatsApp. Your name is remembered in `localStorage`.
+
+Safety: values are NFC-normalised, stripped of control/bidi characters and `<>`, capped (names 40 graphemes, message 120, sky text 28), and only ever written with `textContent` (or drawn to canvas).
+
+Limitation: the site is static, so OG/Twitter preview cards stay the generic Diwali 2026 card. Personalised previews would need an edge function (e.g. Netlify Edge) to rewrite the meta tags per request.

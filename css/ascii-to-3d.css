@@ -7,7 +7,11 @@
   text-shadow:0 0 6px #ff9a2a,0 0 16px #ff5a1f66;white-space:pre;transition:opacity .9s ease}
 #introUi{position:fixed;left:0;right:0;bottom:calc(22px + env(safe-area-inset-bottom));z-index:21;text-align:center;color:#f5e9d0;font-size:.95rem;transition:opacity .6s}
 #introUi p{opacity:.8;margin-bottom:.7em}
-#introUi button{font:inherit;padding:.65em 1.2em;min-height:44px;border-radius:999px;border:1px solid #ffcf6b66;background:#1a0f05aa;color:#ffe2a8;cursor:pointer}
+#introUi button{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 18px;font:600 14px/1 var(--kf-font,system-ui,sans-serif);letter-spacing:.02em;
+  border:1px solid var(--kf-accent-line,#ffb53d88);background:var(--kf-surface-strong,#0b0907f2);color:var(--kf-text,#fbf5ea);cursor:pointer;box-shadow:none}
+#introUi button:hover{border-color:var(--kf-accent,#ffb53d)}
+#introUi button .kf-i{color:var(--kf-accent,#ffb53d)}
+#introUi p{font:500 13px/1.4 var(--kf-font,system-ui,sans-serif);letter-spacing:.08em;text-transform:uppercase}
 body.intro .controls,body.intro #fireworksCanvas{visibility:hidden}
 body:not(.intro) #introUi{opacity:0;pointer-events:none}
 body.dissolve #ascii{opacity:0}
