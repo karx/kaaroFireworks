@@ -1,4 +1,27 @@
-# Design System - Modern Minimalist UI
+# Design System
+
+## UI 2026 (current)
+
+The HUD, panels and Diwali surfaces use `css/hud.css`, which supersedes the glassmorphism notes further down.
+
+- **Sharp:** `border-radius: 0` everywhere, enforced globally. No pills, no soft cards, no hover lift.
+- **Icons:** Lucide-style 24px stroke icons with square caps and miter joins. They are inlined once per page as an SVG sprite (`<symbol id="i-*">`) and used with `<svg class="kf-i"><use href="#i-settings"/></svg>`. JS-built buttons use `window.kfIcon(name)`. There is no icon font and no runtime dependency, and no emoji is used as a button.
+- **Sizes:** every HUD control is 48px tall (`--kf-hud`), with in-panel controls at 44px minimum (`--kf-tap`). Labels show on wide screens, and the HUD collapses to 48×48 icon buttons (with `aria-label`s) at 1100px and 560px.
+- **Tokens (CSS variables):** `--kf-ink`, `--kf-surface`, `--kf-surface-strong`, `--kf-field`, `--kf-line(-strong)`, `--kf-text(-2/-3)`, `--kf-accent` (marigold `#ffb53d`), `--kf-accent-ink`, `--kf-accent-tint`, `--kf-ok`, `--kf-danger`, spacing `--kf-s1..s8` (4px rhythm), type `--kf-fs-xs..xl`, `--kf-track-caps`.
+- **Type hierarchy:**
+  - Eyebrows and panel titles are 11px uppercase, with 0.12em tracking.
+  - Body and buttons are 14–16px at weight 600.
+  - The greeting is clamp(38–80px) at weight 800.
+- **Focus:** a 2px solid accent outline with a 2px offset on every interactive element (`:focus-visible`).
+- **Accent use:**
+  - One filled accent action per surface: Send wishes, Copy link, Send your own wishes.
+  - Everything else is a dark surface with a 1px line.
+  - Active and selected states use an accent border plus a tint (or a 2px accent bar).
+- **Motion:** 150ms color transitions only. `prefers-reduced-motion` and the in-app toggle remove animation.
+
+---
+
+## Legacy notes (2025, glassmorphism)
 
 ## Overview
 Elite minimalist interface design with glassmorphism, subtle animations, and premium aesthetics.

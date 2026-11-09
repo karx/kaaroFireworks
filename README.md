@@ -315,20 +315,20 @@ Getting started with Web Audio API | Articles - web.dev, accessed on October 20,
 
 ## Personalised Diwali links
 
-Both pages read optional URL params and turn them into the greeting, the page title and a name-shaped firework burst (the 3D page also writes the names into the ASCII intro).
+Both pages read optional URL params. The **message lights up the sky**: it is the text the fireworks spell (a particle burst on `/`, a particle burst plus the ASCII intro line on `/ascii-to-3d.html`). Sender names appear only in the greeting overlay and the page title. They are never drawn in the fireworks.
 
 | Param | Meaning | Example |
 |---|---|---|
-| `from` | Sender (required for personalisation) | `from=Kartik` |
-| `to` | Co-sender, joined with "&" | `to=Arshi` → "Happy Diwali from Kartik & Arshi" |
+| `msg` | Sky message: the text the fireworks spell. Best at 28 characters or fewer (the share panel caps it there). Longer messages (up to 120) still show in full in the overlay, and the sky gets the first words. With no `msg`, the sky says **Happy Diwali** (or **शुभ दीपावली** with `lang=hi`) | `msg=Roshni%20Mubarak` |
+| `from` | Sender, shown as "from Kartik" in the overlay | `from=Kartik` |
+| `to` | Co-sender, joined with "&" | `to=Arshi` → "from Kartik & Arshi" |
 | `for` | Recipient | `for=Nani` → "Dear Nani," |
-| `msg` | Short message (≤120 chars) | `msg=Roshni%20aur%20mithaas` |
 | `lang` | `hi` for Hindi copy | `lang=hi` → "दिवाली की शुभकामनाएँ" |
 
-Example: <https://pattaka.netlify.app/ascii-to-3d.html?from=Kartik&to=Arshi>
+Example: <https://pattaka.netlify.app/ascii-to-3d.html?from=Kartik&to=Arshi&msg=Roshni%20Mubarak>
 
-Use **💌 Send wishes** in the HUD to build a link (Copy / Share / WhatsApp); your name is remembered in `localStorage`.
+Use **Send wishes** in the HUD to build a link. The first field, **Sky message**, is the text that lights up the sky, with a live 28-character counter that counts by grapheme, so Hindi isn't cut short. Then come your name, an optional co-sender and recipient, language and 2D/3D, plus Copy / Share / WhatsApp. Your name is remembered in `localStorage`.
 
-Safety: values are NFC-normalised, stripped of control/bidi characters and `<>`, capped (names 40 graphemes, message 120), and only ever written with `textContent`.
+Safety: values are NFC-normalised, stripped of control/bidi characters and `<>`, capped (names 40 graphemes, message 120, sky text 28), and only ever written with `textContent` (or drawn to canvas).
 
 Limitation: the site is static, so OG/Twitter preview cards stay the generic Diwali 2026 card. Personalised previews would need an edge function (e.g. Netlify Edge) to rewrite the meta tags per request.
