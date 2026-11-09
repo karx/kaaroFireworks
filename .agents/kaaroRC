@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "registries": [
+    {
+      "name": "kaaro",
+      "url": "https://github.com/karx/kaaroSkills",
+      "primary": true
+    }
+  ],
+  "linked": [],
+  "skills": [
+    { "name": "kaaro-design-vfx", "path": ".claude/skills/kaaro-design-vfx", "scope": "project" },
+    { "name": "kaaro-pr-workflow", "path": ".claude/skills/kaaro-pr-workflow", "scope": "project" },
+    { "name": "kaaro-analytics", "path": ".claude/skills/kaaro-analytics", "scope": "project" }
+  ],
+  "skillPaths": {
+    "global": "~/.claude/skills",
+    "project": ".claude/skills"
+  }
+}
