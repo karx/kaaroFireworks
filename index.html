@@ -54,6 +54,7 @@
     
     <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/landing-3d-cta.css">
     
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -125,7 +126,32 @@
         <button id="settingsToggle" class="btn-secondary">⚙️</button>
         <button id="shareToggle" class="btn-secondary">📤</button>
         <a href="about.html" class="btn-secondary about-link" title="About">ℹ️</a>
+        <a href="ascii-to-3d.html" class="btn-secondary about-link btn-3d" title="Diwali 2026 3D show" aria-label="Open the Diwali 2026 3D show">3D</a>
     </div>
+    
+    <!-- Diwali 2026: feature the ASCII-to-3D scene -->
+    <div id="cta3d" class="cta-3d">
+        <a href="ascii-to-3d.html" id="cta3dLink">
+            <span class="cta-new">New</span>
+            <span class="cta-long">🪔 Diwali 2026: watch ASCII patakas bloom in 3D</span>
+            <span class="cta-short">🪔 Diwali 2026 in 3D</span>
+            <span class="cta-arrow">→</span>
+        </a>
+        <button type="button" id="cta3dClose" aria-label="Hide the 3D show banner">✕</button>
+    </div>
+    <script>
+      (function () {
+        var cta = document.getElementById('cta3d');
+        try { if (sessionStorage.getItem('kf-cta3d-hidden') === '1') cta.classList.add('hidden'); } catch (e) {}
+        document.getElementById('cta3dClose').addEventListener('click', function () {
+          cta.classList.add('hidden');
+          try { sessionStorage.setItem('kf-cta3d-hidden', '1'); } catch (e) {}
+        });
+        document.getElementById('cta3dLink').addEventListener('click', function () {
+          if (window.plausible) window.plausible('CTA 3D Show');
+        });
+      })();
+    </script>
     
     <div id="settingsPanel" class="settings-panel hidden">
         <div class="panel-header">
