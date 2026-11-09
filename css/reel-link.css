@@ -9,6 +9,7 @@
 .kf-ig-link:focus-visible{outline:2px solid var(--kf-accent,#ffb53d);outline-offset:2px}
 .kf-ig-link svg{width:18px;height:18px;flex:0 0 auto;fill:none;stroke:var(--kf-accent,#ffb53d);stroke-width:1.75;stroke-linecap:square;stroke-linejoin:miter}
 .kf-ig-link .kf-ig-handle{color:var(--kf-text-2,rgba(251,245,234,.72));font-weight:500}
+.kf-ig-link .kf-ig-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .kf-ig-link .kf-ig-dot{color:var(--kf-text-3,rgba(251,245,234,.48))}
 /* floating placement on the fireworks pages: bottom-centre, above the 48px banner on / */
 .kf-ig-float{position:fixed;left:50%;transform:translateX(-50%);z-index:9;bottom:calc(20px + env(safe-area-inset-bottom))}
