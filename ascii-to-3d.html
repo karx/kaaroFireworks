@@ -54,6 +54,7 @@
     
     <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/hud.css">
     
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -101,7 +102,7 @@
     <canvas id="gl" aria-hidden="true"></canvas>
     <pre id="ascii" aria-label="Animated ASCII art of Diwali firecrackers"></pre>
     <div id="introUi"><p id="caption">ASCII patakas…</p><button id="skipIntro" type="button">Skip to 3D →</button></div>
-    <canvas id="fireworksCanvas"></canvas>
+    <canvas id="fireworksCanvas" aria-label="Fireworks sky. Tap or click anywhere to launch a pataka." role="img"></canvas>
     
     <div id="panelBackdrop" class="panel-backdrop hidden"></div>
     
@@ -125,18 +126,18 @@
     </div>
     
     <div class="controls">
-        <button id="autoLaunch" class="btn-primary">Auto Launch</button>
+        <button id="autoLaunch" class="btn-primary" type="button" aria-label="Auto launch fireworks">Auto Launch</button>
         <!-- <button id="showEditorToggle" class="btn-primary">🎬 Show Editor</button> -->
-        <button id="settingsToggle" class="btn-secondary">⚙️</button>
-        <button id="shareToggle" class="btn-secondary">📤</button>
-        <a href="about.html" class="btn-secondary about-link" title="About">ℹ️</a>
-        <a href="index.html" class="btn-secondary about-link" title="Classic 2D show">2D</a>
+        <button id="settingsToggle" class="btn-secondary" type="button" aria-label="Settings" aria-controls="settingsPanel" title="Settings">⚙️</button>
+        <button id="shareToggle" class="btn-secondary" type="button" aria-label="Share, save and multi-user rooms" aria-controls="sharePanel" title="Share &amp; save">📤</button>
+        <a href="about.html" class="btn-secondary about-link" title="About" aria-label="About Kaaro Fireworks">ℹ️</a>
+        <a href="index.html" class="btn-secondary about-link" title="Classic 2D show" aria-label="Open the classic 2D show">2D</a>
     </div>
     
     <div id="settingsPanel" class="settings-panel hidden">
         <div class="panel-header">
             <h3>Settings</h3>
-            <button class="panel-close" id="settingsClose">✕</button>
+            <button class="panel-close" id="settingsClose" type="button" aria-label="Close settings">✕</button>
         </div>
         
         <div class="setting-group">
@@ -283,7 +284,7 @@
     <div id="sharePanel" class="settings-panel hidden">
         <div class="panel-header">
             <h3>Share & Save</h3>
-            <button class="panel-close" id="shareClose">✕</button>
+            <button class="panel-close" id="shareClose" type="button" aria-label="Close share panel">✕</button>
         </div>
         
         <div class="setting-group">
@@ -530,6 +531,7 @@
     <script src="js/sync.js"></script>
     <script src="js/show-editor.js"></script>
     <script src="js/ui.js"></script>
+    <script src="js/personalize.js"></script>
     <script type="module" src="js/ascii-to-3d.js"></script>
 </body>
 </html>
