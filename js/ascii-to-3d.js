@@ -535,11 +535,22 @@ window.createExplosion = function (x, y, style) {
     if (style === 'peony') { q._peony = true; }
   }
 };
+// Name/text bursts (e.g. ?from=Kartik&to=Arshi) are dense; tag them so they render as crisp, readable letters.
+let textBurstUntil = 0;
+const classicTextExplosion = window.createTextExplosion;
+if (classicTextExplosion) window.createTextExplosion = function (text, x, y, opts = {}) {
+  textBurstUntil = performance.now() + (opts.delay || 0) + 2500;
+  return classicTextExplosion.call(this, text, x, y, opts);
+};
 const PI = window.Particle.prototype.init;
 window.Particle.prototype.init = function (...a) {
   PI.apply(this, a);
+  const o = a[5];
+  this._text = performance.now() < textBurstUntil && !!o && o.trail === false && o.colorTransition === false && Math.abs((o.gravity || 0) - window.config.gravity * 0.3) < 1e-9;
   const sp = Math.hypot(this.vx, this.vy);
   this._z = 0; this._vz = (Math.random() * 2 - 1) * sp * 0.55;
+  // Text particles spawn staggered over ~2s; slow their fade and keep them flat so the whole name reads at once.
+  if (this._text) { this._vz = 0; this.customGravity = window.config.gravity * 0.03; this.decay = 0.0045 + Math.random() * 0.002; }
   this._glitter = Math.random() > 0.85;
   this._born = performance.now();
 };
@@ -606,7 +617,13 @@ function drawClassic(dt) {
     // Glitter flicker (metal-flake strobe).
     if (p._glitter) a *= 0.35 + 0.65 * Math.abs(Math.sin(p.twinklePhase * 3.7 + (p._born || 0) * 0.01));
     if (a <= 0) continue;
-    const c = col(p.color); pxToWorld(p.x, p.y, wp); const z = (p._z || 0) * s;
+    const c = col(p.color); pxToWorld(p.x, p.y, wp);
+    if (p._text) {           // crisp, readable name letters: small, warm, no streaks/hot core
+      const tk = Math.min(1, p.alpha * 1.4);
+      emit(wp.x, wp.y, wp.z, c.r * tk * 2.2, c.g * tk * 1.7, c.b * tk * 1.0, p.size * s * 1.9);
+      continue;
+    }
+    const z = (p._z || 0) * s;
     const sizeMul = p._peony && a > 0.6 ? 2.8 : (a > .7 ? 2.6 : 2.0);
     const size = p.size * s * 2 * sizeMul;
     if (pN < pCap) {
@@ -721,6 +738,14 @@ function stepFx(dt) {
 
 /* ---------------- ASCII intro ---------------- */
 const pre = document.getElementById('ascii'), caption = document.getElementById('caption');
+const KP = window.KF_PERSONAL || {};
+const PERSONAL_LINE = (() => {
+  if (!KP.active) return [];
+  const line = KP.lang === 'hi' ? `${KP.senders} की ओर से` : `from ${KP.senders}`;
+  const seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null;
+  return (seg ? Array.from(seg.segment(line), x => x.segment) : [...line]).slice(0, 60);
+})();
+if (KP.active) caption.textContent = KP.lang === 'hi' ? `${KP.senders} की ओर से ASCII पटाखे…` : `ASCII patakas from ${KP.senders}…`;
 let COLS, ROWS, grid, ents, introT0, introRaf, phase = 'ascii';
 const DIYA = ['  (  ', ' _)_ ', '\\___/'];
 function asciiSize() {
@@ -754,6 +779,8 @@ function asciiStep(dt, t) {
   ents = ents.filter(e => !e.dead);
   const msg = 'S H U B H   D E E P A V A L I';
   if (t > 1200) [...msg].forEach((c, i) => i < (t - 1200) / 60 && put((COLS - msg.length) / 2 + i, Math.floor(ROWS * .55), c));
+  // Personalised line (?from=&to=): grapheme-safe so Hindi names never split mid-cluster.
+  if (PERSONAL_LINE.length && t > 2600) PERSONAL_LINE.forEach((c, i) => i < (t - 2600) / 70 && put((COLS - PERSONAL_LINE.length) / 2 + i, Math.floor(ROWS * .55) + 2, c));
   pre.textContent = grid.map(r => r.join('')).join('\n');
 }
 function asciiLoop(now) {
@@ -793,6 +820,7 @@ function enterShow() {
   if (phase === 'show') return; phase = 'show';
   document.body.classList.remove('intro'); pre.remove();
   setTimeout(() => window.launchFirework(window.canvas.width / 2, window.canvas.height / 3), 500);
+  if (KP.active) window.kfNameBurst?.(1700);   // names burst in 3D particles
 }
 
 function mirrorTo2D() {
