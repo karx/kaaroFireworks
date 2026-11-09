@@ -18,13 +18,14 @@ Spell words and messages with fireworks particles!
 **How to Use**:
 1. Open Settings (⚙️ button)
 2. Find "Text Explosions" section
-3. Enter your text (e.g., "HAPPY", "2025", "HELLO WORLD")
+3. Enter your text (e.g., "HAPPY", "DIWALI 2026", "HELLO WORLD")
 4. Adjust size slider (optional)
 5. Click "🔤 Launch" or press Enter
 
 **Use Cases**:
 - Birthday celebrations: "HAPPY BIRTHDAY"
-- New Year: "2025" or "HAPPY NEW YEAR"
+- Diwali: "SHUBH DEEPAVALI" or "DIWALI 2026"
+- New Year: "2027" or "HAPPY NEW YEAR"
 - Announcements: "CONGRATS" or "WE DID IT"
 - Branding: Company names or slogans
 - Personal messages: Names, greetings

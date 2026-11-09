@@ -312,3 +312,23 @@ Getting started with Web Audio API | Articles - web.dev, accessed on October 20,
 - Rendering: WebGL2, HDR, ACES tone mapping, UnrealBloom, film grain and vignette. The ground is wet tiles with a planar reflection, and a Poly Haven CC0 night HDRI provides PBR reflections. The scene includes a moon, twinkling stars, a 3D city skyline, PBR clay diyas with flickering lights, an anar fountain, a spinning chakri, rocket models, smoke sprites, and dynamic point lights for each burst.
 - The page adapts its pixel ratio and drops the reflection on slow GPUs. Mobile gets particle and light caps. With `prefers-reduced-motion`, the intro is a still frame with a short fade and no camera sway.
 - `?phase=3d` skips the intro, and `?hold` freezes it. three.js r160 is vendored in `vendor/three` (MIT).
+
+## Personalised Diwali links
+
+Both pages read optional URL params and turn them into the greeting, the page title and a name-shaped firework burst (the 3D page also writes the names into the ASCII intro).
+
+| Param | Meaning | Example |
+|---|---|---|
+| `from` | Sender (required for personalisation) | `from=Kartik` |
+| `to` | Co-sender, joined with "&" | `to=Arshi` → "Happy Diwali from Kartik & Arshi" |
+| `for` | Recipient | `for=Nani` → "Dear Nani," |
+| `msg` | Short message (≤120 chars) | `msg=Roshni%20aur%20mithaas` |
+| `lang` | `hi` for Hindi copy | `lang=hi` → "दिवाली की शुभकामनाएँ" |
+
+Example: <https://pattaka.netlify.app/ascii-to-3d.html?from=Kartik&to=Arshi>
+
+Use **💌 Send wishes** in the HUD to build a link (Copy / Share / WhatsApp); your name is remembered in `localStorage`.
+
+Safety: values are NFC-normalised, stripped of control/bidi characters and `<>`, capped (names 40 graphemes, message 120), and only ever written with `textContent`.
+
+Limitation: the site is static, so OG/Twitter preview cards stay the generic Diwali 2026 card. Personalised previews would need an edge function (e.g. Netlify Edge) to rewrite the meta tags per request.
