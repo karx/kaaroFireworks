@@ -1,21 +1,29 @@
-/* Diwali 2026: feature the ASCII-to-3D scene on the classic landing page. */
-.controls .btn-3d{font-weight:700;letter-spacing:.5px;color:#ffe2a8;text-decoration:none;display:flex;align-items:center;justify-content:center;
-  border-color:rgba(255,190,100,.55);box-shadow:0 0 12px rgba(255,150,40,.35)}
-.cta-3d{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9;
-  display:flex;align-items:center;gap:6px;width:max-content;max-width:calc(100vw - 24px)}
-.cta-3d a{display:flex;align-items:center;gap:10px;padding:12px 20px;min-height:48px;border-radius:999px;text-decoration:none;
-  color:#fff3d6;font:600 15px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;
-  background:linear-gradient(135deg,rgba(120,30,10,.88),rgba(60,12,40,.88));border:1px solid rgba(255,190,100,.6);
-  box-shadow:0 0 0 1px rgba(255,120,40,.15),0 0 22px rgba(255,140,40,.45),0 6px 20px rgba(0,0,0,.5);
-  animation:cta-glow 2.8s ease-in-out infinite}
-.cta-3d a:hover,.cta-3d a:focus-visible{background:linear-gradient(135deg,rgba(150,40,10,.95),rgba(80,16,52,.95));outline:none}
-.cta-3d .cta-arrow{font-weight:800;color:#ffd36b}
-.cta-3d .cta-new{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#2a0d00;background:#ffcf6b;border-radius:999px;padding:3px 8px}
-.cta-3d button{width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.55);color:#fff;cursor:pointer;font-size:14px;line-height:1}
+/* Diwali 2026 landing banner: one sharp 48px bar (uses the tokens from hud.css). */
+.cta-3d{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9;
+  display:flex;align-items:stretch;gap:0;width:max-content;max-width:calc(100vw - 24px);
+  background:var(--kf-surface-strong,rgba(11,9,7,.95));border:1px solid var(--kf-line,rgba(255,232,196,.14));box-shadow:var(--kf-shadow,0 12px 32px rgba(0,0,0,.45))}
 .cta-3d.hidden{display:none}
-.cta-3d .cta-short{display:none}
+.cta-3d a{display:flex;align-items:center;gap:var(--kf-s3,12px);min-height:var(--kf-hud,48px);padding:0 var(--kf-s4,16px) 0 0;box-sizing:border-box;
+  text-decoration:none;color:var(--kf-text,#fbf5ea);font:600 15px/1.2 var(--kf-font,system-ui,sans-serif);transition:background-color .15s ease}
+.cta-3d a:hover{background:var(--kf-surface-hover,rgba(30,23,18,.92))}
+.cta-3d .cta-new{align-self:stretch;display:flex;align-items:center;padding:0 var(--kf-s3,12px);
+  font:800 11px/1 var(--kf-font,system-ui,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--kf-accent-ink,#1b1004);background:var(--kf-accent,#ffb53d)}
+.cta-3d .cta-ico{width:18px;height:18px;color:var(--kf-accent,#ffb53d)}
+.cta-3d .cta-arrow{display:flex;color:var(--kf-accent,#ffb53d)}
+.cta-3d .cta-arrow .kf-i{width:18px;height:18px}
 .cta-3d a span{white-space:nowrap}
-@keyframes cta-glow{0%,100%{box-shadow:0 0 0 1px rgba(255,120,40,.15),0 0 16px rgba(255,140,40,.35),0 6px 20px rgba(0,0,0,.5)}
-  50%{box-shadow:0 0 0 1px rgba(255,120,40,.25),0 0 30px rgba(255,160,60,.6),0 6px 20px rgba(0,0,0,.5)}}
-@media (prefers-reduced-motion: reduce){.cta-3d a{animation:none}}
-@media (max-width:480px){.cta-3d a{font-size:15px;padding:11px 18px;gap:8px}.cta-3d .cta-long{display:none}.cta-3d .cta-short{display:inline}}
+.cta-3d .cta-short{display:none}
+.cta-3d > button{flex:0 0 auto;width:var(--kf-hud,48px);height:auto;min-height:var(--kf-hud,48px);padding:0;margin:0;display:grid;place-items:center;cursor:pointer;
+  color:var(--kf-text-2,rgba(251,245,234,.72));background:transparent;border:0;border-left:1px solid var(--kf-line,rgba(255,232,196,.14));box-shadow:none;backdrop-filter:none}
+.cta-3d > button:hover{color:var(--kf-text,#fbf5ea);background:var(--kf-field-hover,rgba(255,255,255,.08))}
+.cta-3d > button .kf-i{width:18px;height:18px}
+.cta-3d > .kf-reel-pill{width:auto;padding:0 var(--kf-s4,16px);gap:var(--kf-s2,8px);align-items:center;border-left:0;border-right:1px solid var(--kf-line,rgba(255,232,196,.14));
+  font:700 13px/1 var(--kf-font,system-ui,sans-serif);letter-spacing:.08em;text-transform:uppercase;color:var(--kf-text,#fbf5ea)}
+.cta-3d > .kf-reel-pill .kf-i{width:14px;height:14px;color:var(--kf-accent,#ffb53d);fill:var(--kf-accent,#ffb53d)}
+@media (max-width:560px){
+  .cta-3d{left:8px;right:8px;transform:none;width:auto;max-width:none}
+  .cta-3d a{flex:1 1 auto;min-width:0;padding-left:var(--kf-s4,16px)}
+  .cta-3d .cta-new,.cta-3d .cta-long,.cta-3d .cta-ico{display:none}
+  .cta-3d .cta-short{display:inline}
+  .cta-3d a .cta-arrow{margin-left:auto}
+}
