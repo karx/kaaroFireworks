@@ -1,0 +1,14 @@
+{
+  "name": "kaaro-fireworks",
+  "private": true,
+  "description": "Dev-only tooling. The site itself is static (no build step); nothing here is shipped to Netlify.",
+  "type": "module",
+  "scripts": {
+    "serve": "npx --yes http-server . -p 8000 -c-1 --silent",
+    "check:js": "node -e \"for (const f of require('fs').readdirSync('js')) if (f.endsWith('.js')) require('child_process').execFileSync(process.execPath, ['--check', 'js/' + f], {stdio: 'inherit'})\"",
+    "test": "node tests/ux-smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "1.49.1"
+  }
+}

@@ -1,10 +1,20 @@
 // Headless UX smoke test (dev only, not shipped): desktop 1280x720 + mobile 390x844, msg / no msg / Hindi / injection probe.
-// Usage: npm i playwright-core && BASE=http://127.0.0.1:8000 PFX=after SHOTS=./shots node tests/ux-smoke.mjs
-// Prints a JSON report (page errors, dialogs, burst texts, HUD sizes) and writes screenshots.
+// Usage: npm ci && npm run serve   (other terminal)   npm test      (env: BASE, PFX, SHOTS, CHROME; shots go to ./shots, git-ignored)
+// Prints a JSON report (page errors, dialogs, burst texts, HUD sizes), writes screenshots,
+// and exits 1 if any page failed, logged errors, opened a dialog, or a check returned ok:false.
 import { chromium } from 'playwright-core';
-const B = process.env.BASE, PFX = process.env.PFX || 'after';
+import { existsSync, mkdirSync } from 'node:fs';
+const B = process.env.BASE || 'http://127.0.0.1:8000', PFX = process.env.PFX || 'after';
 const S = process.env.SHOTS || './shots';
-const b = await chromium.launch({ executablePath: process.env.CHROME || '/usr/bin/google-chrome', headless: true,
+mkdirSync(S, { recursive: true });
+const chromePath = process.env.CHROME || [
+  '/usr/bin/google-chrome', '/usr/bin/chromium',
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+].find(existsSync);
+if (!chromePath) { console.error('No Chrome found. Set CHROME=/path/to/chrome'); process.exit(2); }
+const b = await chromium.launch({ executablePath: chromePath, headless: true,
   args: ['--use-gl=angle','--enable-webgl','--ignore-gpu-blocklist','--no-sandbox','--autoplay-policy=no-user-gesture-required'] });
 const report = {};
 const shot = (p, n) => p.screenshot({ path: `${S}/${PFX}-${n}.png` });
@@ -108,3 +118,6 @@ await page('settings-mobile', '/ascii-to-3d.html', M, true, async p => {
 });
 await b.close();
 console.log(JSON.stringify(report, null, 1));
+const failures = Object.entries(report).filter(([, r]) => r.fail || (r.errs && r.errs.length) || r.dialogs > 0 || r.ok === false).map(([n]) => n);
+if (failures.length) { console.error('FAILED: ' + failures.join(', ')); process.exit(1); }
+console.error('OK: ' + Object.keys(report).length + ' pages, no errors');
