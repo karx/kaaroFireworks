@@ -29,7 +29,7 @@ para: SkillSurface
 
 | Layer | Technology |
 |---|---|
-| Pages | Static multi-page HTML, no build step, no bundler, no `package.json` |
+| Pages | Static multi-page HTML, no build step, no bundler. `package.json` exists for dev tooling only (tests); nothing in it is shipped |
 | Classic show (`/`) | Vanilla JS on a 2D canvas (`js/config.js`, `fireworks.js`, `particles.js`, `main.js`) |
 | 3D show (`/ascii-to-3d`) | Three.js (WebGL2) ES module, vendored in `vendor/three/` via an import map; post-processing with EffectComposer + UnrealBloom + ACES tone mapping, HDRI from `assets/hdri/` |
 | UI | Plain CSS design tokens in `css/hud.css`, inline SVG icon sprite — no framework, no icon font |
@@ -63,12 +63,38 @@ The 2025 glassmorphism notes in `DESIGN_SYSTEM.md` ("Legacy notes") are stale; t
 ## Run it locally
 
 ```bash
-python3 -m http.server 8000        # from the repo root
+npm run serve                      # from the repo root (static server on :8000; `python3 -m http.server 8000` also works)
 # http://localhost:8000/            classic show
 # http://localhost:8000/ascii-to-3d.html?phase=3d   skip straight to 3D
 ```
 
-Serve over HTTP — opening `file://` breaks the ES-module import map. Local servers don't apply `_redirects` or `404.html`; check those on the Netlify deploy preview. Smoke test: see `.claude/skills/kaaro-pr-workflow/SKILL.md`.
+Serve over HTTP — opening `file://` breaks the ES-module import map. Local servers don't apply `_redirects` or `404.html`; check those on the Netlify deploy preview. Checks: `npm ci && npm test` (headless Playwright smoke test, exits 1 on any page error; needs Chrome, set `CHROME=` if not auto-found), `npm run check:js` (syntax). Full routine: `.claude/skills/kaaro-pr-workflow/SKILL.md`.
+
+---
+
+## Source map
+
+Derived from each file's header comment. If a file here disagrees with this table, the file wins; fix the table.
+
+| File | Role |
+|---|---|
+| `js/config.js` | Global config, explosion types, preset shows, canvas setup |
+| `js/fireworks.js` | Firework class, explosions, background rendering |
+| `js/particles.js` | Particle class and pool |
+| `js/main.js` | Animation loop, canvas resize, init (replaced by `ascii-to-3d.js` on the 3D page) |
+| `js/audio.js` | Sample-based audio with spatial effects and per-style presets |
+| `js/performance.js` | Object pooling, FPS monitor, adaptive quality |
+| `js/ui.js` | All UI controls and panels |
+| `js/sync.js` | Firebase room sync (see `FIREBASE_SETUP.md`) |
+| `js/show-editor.js` | Timeline-based show sequencer |
+| `js/personalize.js` | Personalised links and the Send wishes panel |
+| `js/analytics.js` | Plausible wrapper and event helpers |
+| `js/ascii-to-3d.js` | ASCII intro to three.js scene |
+| `js/reel.js`, `js/reel-link.js`, `js/welcome.js` | Reel modal, reel link click tracking, first-visit overlay |
+| `css/hud.css` | UI 2026 tokens and HUD (layered on `style.css`) |
+| `css/ascii-to-3d.css`, `landing-3d-cta.css`, `reel-link.css`, `welcome.css` | Per-feature styles using the `hud.css` tokens |
+
+Drift check: `ls js css` should list nothing this table omits.
 
 ---
 
@@ -111,6 +137,8 @@ Serve over HTTP — opening `file://` breaks the ES-module import map. Local ser
 ---
 
 ## Related
+
+The Oct 2025 docs are historical: where they disagree with the code or this file, the code and this file win.
 
 - `DESIGN_SYSTEM.md`, `PERFORMANCE_OPTIMIZATIONS.md`, `MOBILE_UX_IMPROVEMENTS.md`
 - `SEO_OPTIMIZATION.md`, `SHARING_FEATURES.md`, `DEPLOYMENT_CHECKLIST.md`

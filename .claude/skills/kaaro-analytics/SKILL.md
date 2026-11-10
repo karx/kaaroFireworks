@@ -55,7 +55,12 @@ Never call `plausible()` directly. `analytics.track(name, props)` adds `page` (f
 
 ## 5. Event catalogue (as in code, Nov 2026)
 
-`page` is added to every event. "Caller" = where it's fired from.
+`page` is added to every event. "Caller" = where it's fired from. `js/analytics.js` is authoritative; this table adds props and callers. Drift check — every name printed here must have a row below:
+
+```bash
+grep -ho "track('[a-z_]*'" js/*.js | sort -u
+```
+(`reel.js` calls `analytics.trackReel(action)`, which prefixes `reel_`, so `download`, `open`, `send_wishes` appear there and are catalogued as `reel_*`.)
 
 | Event | Props | Caller |
 |---|---|---|

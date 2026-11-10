@@ -37,10 +37,10 @@ git switch -c <type>/<topic>        # feat/…, fix/…, docs/…, perf/…, cho
 
 ## 4. Local checks
 
-There is no `package.json`, linter config or CI test suite. Run these yourself:
+`package.json` holds dev tooling only (no build step). There is no linter config or CI yet. Run these yourself:
 
 ```bash
-python3 -m http.server 8000 >/tmp/kf-server.log 2>&1 &     # serve repo root
+npm run serve &                                  # serve repo root on :8000
 
 # a) HTML validity (report errors you introduced; pre-existing warnings are not blockers)
 npx --yes html-validate index.html ascii-to-3d.html about.html 404.html
@@ -52,11 +52,11 @@ npx --yes linkinator http://localhost:8000/ --recurse --skip "^(?!http://localho
 for f in js/*.js; do node --check "$f" || echo "SYNTAX $f"; done   # Node 22+ auto-detects ES modules
 
 # d) Console errors + screenshots, desktop 1280x720 and mobile 390x844
-mkdir -p /workspace/kf-shots && npm i --no-save playwright-core
-BASE=http://localhost:8000 PFX=after SHOTS=/workspace/kf-shots node tests/ux-smoke.mjs
+npm ci
+BASE=http://localhost:8000 SHOTS=/workspace/kf-shots npm test   # exits 1 on page errors / dialogs / failed checks
 ```
 
-`tests/ux-smoke.mjs` covers `/` with/without `msg`, Hindi, an XSS/bidi probe and the share panel, and prints a JSON report (`errs`, `dialogs`, `bursts`, HUD sizes). Pass = `errs` empty (Plausible/network noise is filtered), `dialogs: 0`, sky bursts equal `msg` or the default. For pages it doesn't cover (`/ascii-to-3d.html?phase=3d`, `/about.html`, `/404.html`), take the same two viewport screenshots with Playwright and capture `pageerror` + `console.error`. Use `--use-gl=angle --enable-webgl --ignore-gpu-blocklist` for WebGL.
+`tests/ux-smoke.mjs` covers `/` with/without `msg`, Hindi, an XSS/bidi probe and the share panel, and prints a JSON report (`errs`, `dialogs`, `bursts`, HUD sizes). Pass = exit code 0 (`errs` empty (Plausible/network noise is filtered), `dialogs: 0`, sky bursts equal `msg` or the default. For pages it doesn't cover (`/ascii-to-3d.html?phase=3d`, `/about.html`, `/404.html`), take the same two viewport screenshots with Playwright and capture `pageerror` + `console.error`. Use `--use-gl=angle --enable-webgl --ignore-gpu-blocklist` for WebGL.
 
 **Look at every screenshot** before pushing. Keep screenshots outside the repo (e.g. `/workspace/kf-shots/`).
 
@@ -82,7 +82,7 @@ P=https://deploy-preview-<N>--pattaka.netlify.app
 |---|---|
 | Pages | `curl -sI $P/ $P/ascii-to-3d.html $P/about.html` → 200 |
 | 404 | `curl -s -o /dev/null -w '%{http_code}' $P/nope` → **404**, body "This pataka fizzled" |
-| Short links | `curl -sI $P/wa` → **302**, `Location: /?utm_source=whatsapp&utm_medium=status&utm_campaign=diwali26_reel`; same for `/ig /yt /fb /x /li /tg`; `/3d` → `/ascii-to-3d?…` |
+| Short links | every rule in `_redirects` → **302** with that rule's target as `Location`: `grep -E '^/[a-z0-9]+ ' _redirects \| while read f t _; do echo "$f $(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' $P$f)"; done` |
 | No catch-all | `_redirects` has no `/*` rule; unknown paths stay 404 |
 | OG/Twitter | `curl -s $P/ \| grep -E 'og:|twitter:'` → `og:image` + `twitter:image` = `https://pattaka.netlify.app/assets/og/diwali-2026-og.jpg`, 1200×630, `summary_large_image`, `og:url`/canonical on pattaka |
 | Share image | `curl -sI https://pattaka.netlify.app/assets/og/diwali-2026-og.jpg` → 200 `image/jpeg` (check `$P/assets/og/…` if the PR changes it) |
