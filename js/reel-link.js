@@ -7,4 +7,11 @@
   a.addEventListener('click', function () {
     try { window.analytics && window.analytics.trackReelLinkClick(a.getAttribute('data-placement') || 'footer'); } catch (e) {}
   });
+  // Floating placement only: show for ~3.5s, then fade out and stay gone for the session.
+  if (a.classList.contains('kf-ig-float')) {
+    setTimeout(function () {
+      a.classList.add('is-faded');
+      setTimeout(function () { a.style.display = 'none'; }, 900);
+    }, 3500);
+  }
 })();
