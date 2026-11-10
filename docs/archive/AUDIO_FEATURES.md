@@ -1,3 +1,5 @@
+> **Historical (Oct 2025).** Kept for context. Where this disagrees with the code or `AGENTS.md`, the code wins.
+
 # Audio Enhancement Features - v2.0
 
 ## Current Audio System ✅

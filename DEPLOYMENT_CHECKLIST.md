@@ -25,9 +25,9 @@
 ### Documentation
 - [x] README.md updated
 - [x] FIREBASE_SETUP.md complete
-- [x] SETUP_INSTRUCTIONS.md complete
-- [x] USER_FEATURES.md updated
-- [x] IMAGE_SYNC_PROPOSAL.md created
+- [x] docs/archive/SETUP_INSTRUCTIONS.md complete
+- [x] docs/archive/USER_FEATURES.md updated
+- [x] docs/archive/IMAGE_SYNC_PROPOSAL.md created
 
 ## Firebase Configuration
 
@@ -309,7 +309,7 @@ netlify deploy --prod
 - Performance optimizations
 
 ### Known Limitations
-- Image explosions not synchronized (see IMAGE_SYNC_PROPOSAL.md)
+- Image explosions not synchronized (see docs/archive/IMAGE_SYNC_PROPOSAL.md)
 - Maximum 100 simultaneous connections (Firebase free tier)
 ```
 
@@ -431,9 +431,9 @@ https://github.com/karx/kaaroFireworks
 
 **Documentation:**
 - FIREBASE_SETUP.md
-- SETUP_INSTRUCTIONS.md
-- USER_FEATURES.md
-- IMAGE_SYNC_PROPOSAL.md
+- docs/archive/SETUP_INSTRUCTIONS.md
+- docs/archive/USER_FEATURES.md
+- docs/archive/IMAGE_SYNC_PROPOSAL.md
 
 ---
 

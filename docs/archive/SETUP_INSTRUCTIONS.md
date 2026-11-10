@@ -1,3 +1,5 @@
+> **Historical (Oct 2025).** Kept for context. Where this disagrees with the code or `AGENTS.md`, the code wins.
+
 # Setup Instructions for Multi-User Sync
 
 ## ✅ Step 1: Apply Firebase Security Rules

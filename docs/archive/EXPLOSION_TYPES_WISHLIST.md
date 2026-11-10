@@ -1,3 +1,5 @@
+> **Historical (Oct 2025).** Kept for context. Where this disagrees with the code or `AGENTS.md`, the code wins.
+
 # Explosion Types & Shapes - Refactoring Wishlist
 
 ## Current State Analysis
