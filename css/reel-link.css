@@ -14,9 +14,12 @@
 /* floating placement on the fireworks pages: bottom-centre, above the 48px banner on / */
 .kf-ig-float{position:fixed;left:50%;transform:translateX(-50%);z-index:9;bottom:calc(20px + env(safe-area-inset-bottom))}
 .cta-3d:not(.hidden) ~ .kf-ig-float{bottom:calc(20px + 48px + 8px + env(safe-area-inset-bottom))}
+/* auto-fade: shown ~3.5s after load, then fades out (js/reel-link.js adds .is-faded, then removes the node) */
+.kf-ig-float{transition:opacity .8s ease,border-color .15s ease,background-color .15s ease}
+.kf-ig-float.is-faded{opacity:0;pointer-events:none}
 /* 3D page: sit under the intro caption / skip button */
 body[data-page="ascii"] #introUi{bottom:calc(20px + 44px + 12px + env(safe-area-inset-bottom))}
 /* about page: inline under the tagline */
 .kf-ig-inline{margin-top:20px}
-@media (prefers-reduced-motion: reduce){.kf-ig-link{transition:none}}
+@media (prefers-reduced-motion: reduce){.kf-ig-link,.kf-ig-float{transition:none}}
 
